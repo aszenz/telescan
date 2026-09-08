@@ -1,0 +1,3170 @@
+{
+  "version": 1,
+  "apps": [
+    {
+      "id": "vscode",
+      "name": "Visual Studio Code",
+      "category": "editors",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Usage events, error telemetry and crash reports sent to Microsoft. Extensions send their own telemetry, which the same setting gates.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "code"
+        ],
+        "paths": [
+          "{config}/Code/User/settings.json",
+          "{home}/Library/Application Support/Code/User/settings.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetry.telemetryLevel",
+          "files": [
+            "{config}/Code/User/settings.json",
+            "{home}/Library/Application Support/Code/User/settings.json"
+          ],
+          "disabled_when": [
+            "off"
+          ],
+          "enabled_when": [
+            "all",
+            "error",
+            "crash"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "telemetry.enableTelemetry",
+          "files": [
+            "{config}/Code/User/settings.json",
+            "{home}/Library/Application Support/Code/User/settings.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set \"telemetry.telemetryLevel\": \"off\" in settings.json (Preferences > Settings > search for telemetry).",
+          "Start the editor with --disable-telemetry for a single run."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://code.visualstudio.com/docs/configure/telemetry"
+    },
+    {
+      "id": "cursor",
+      "name": "Cursor",
+      "category": "editors",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "VS Code fork. Sends editor telemetry, plus prompt and code data unless Privacy Mode is on.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "cursor"
+        ],
+        "paths": [
+          "{config}/Cursor/User/settings.json",
+          "{home}/Library/Application Support/Cursor/User/settings.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetry.telemetryLevel",
+          "files": [
+            "{config}/Cursor/User/settings.json",
+            "{home}/Library/Application Support/Cursor/User/settings.json"
+          ],
+          "disabled_when": [
+            "off"
+          ],
+          "enabled_when": [
+            "all",
+            "error",
+            "crash"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set \"telemetry.telemetryLevel\": \"off\" in settings.json.",
+          "Turn on Privacy Mode in Cursor Settings > General to stop code and prompts leaving the machine."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://cursor.com/security"
+    },
+    {
+      "id": "vscodium",
+      "name": "VSCodium",
+      "category": "editors",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "VS Code build with the Microsoft telemetry endpoints removed. Extensions can still report on their own.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "codium"
+        ],
+        "paths": [
+          "{config}/VSCodium/User/settings.json",
+          "{home}/Library/Application Support/VSCodium/User/settings.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetry.telemetryLevel",
+          "files": [
+            "{config}/VSCodium/User/settings.json",
+            "{home}/Library/Application Support/VSCodium/User/settings.json"
+          ],
+          "disabled_when": [
+            "off"
+          ],
+          "enabled_when": [
+            "all",
+            "error",
+            "crash"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Telemetry is off in the build. Keep \"telemetry.telemetryLevel\": \"off\" to also mute extensions."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://vscodium.com/#telemetry"
+    },
+    {
+      "id": "jetbrains",
+      "name": "JetBrains IDEs (IntelliJ, PyCharm, WebStorm, ...)",
+      "category": "editors",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "The Data Sharing option sends feature usage statistics to JetBrains.",
+      "default_state": "unknown",
+      "detect": {
+        "paths": [
+          "{data}/JetBrains",
+          "{home}/Library/Application Support/JetBrains",
+          "{home}/.local/share/JetBrains"
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "files": [
+            "{data}/JetBrains/consentOptions/accepted",
+            "{home}/Library/Application Support/JetBrains/consentOptions/accepted",
+            "{home}/.local/share/JetBrains/consentOptions/accepted"
+          ],
+          "disabled_pattern": "rsch\\.send\\.usage\\.stat:[^:]*:0",
+          "enabled_pattern": "rsch\\.send\\.usage\\.stat:[^:]*:1"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Settings > Appearance & Behavior > System Settings > Data Sharing: clear all boxes.",
+          "For a fleet, ship an idea.properties with the Data Sharing consent already declined."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://www.jetbrains.com/help/idea/settings-usage-statistics.html"
+    },
+    {
+      "id": "android-studio",
+      "name": "Android Studio / Android SDK tools",
+      "category": "editors",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends usage statistics and crash reports to Google. The setting also covers the SDK command line tools.",
+      "default_state": "unknown",
+      "detect": {
+        "paths": [
+          "{home}/.android"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "hasOptedIn",
+          "files": [
+            "{home}/.android/analytics.settings"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Settings > Appearance & Behavior > System Settings > Data Sharing: clear the box.",
+          "Or set \"hasOptedIn\": false in ~/.android/analytics.settings."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://developer.android.com/studio/preview/data-sharing"
+    },
+    {
+      "id": "zed",
+      "name": "Zed",
+      "category": "editors",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "what": "Sends metrics (feature usage) and diagnostics (crash reports).",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "zed"
+        ],
+        "paths": [
+          "{config}/zed/settings.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetry.metrics",
+          "files": [
+            "{config}/zed/settings.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Add to ~/.config/zed/settings.json: \"telemetry\": { \"diagnostics\": false, \"metrics\": false }"
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://zed.dev/docs/telemetry"
+    },
+    {
+      "id": "neovim",
+      "name": "Neovim / Vim",
+      "category": "editors",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "No telemetry in the editor. Plugins and language servers can still call home.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "nvim",
+          "vim"
+        ]
+      },
+      "checks": [],
+      "disable": {
+        "steps": [
+          "Nothing to turn off. Audit the plugins and language servers you install."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://neovim.io/"
+    },
+    {
+      "id": "homebrew",
+      "name": "Homebrew",
+      "category": "package-managers",
+      "platforms": [
+        "macos",
+        "linux"
+      ],
+      "what": "Sends anonymous install and build events to a Homebrew owned InfluxDB.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "brew"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "HOMEBREW_NO_ANALYTICS",
+          "disabled_when": [
+            "*truthy*"
+          ]
+        },
+        {
+          "type": "command",
+          "argv": [
+            "brew",
+            "analytics",
+            "state"
+          ],
+          "disabled_pattern": "disabled|are not enabled",
+          "enabled_pattern": "are enabled"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: brew analytics off",
+          "Or export HOMEBREW_NO_ANALYTICS=1 in your shell profile."
+        ],
+        "commands": [
+          "brew analytics off"
+        ],
+        "env": {
+          "HOMEBREW_NO_ANALYTICS": "1"
+        }
+      },
+      "docs": "https://docs.brew.sh/Analytics"
+    },
+    {
+      "id": "npm",
+      "name": "npm",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "No usage telemetry. The registry still sees your install requests, and the update notifier calls out on its own.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "npm"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "NO_UPDATE_NOTIFIER",
+          "disabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Nothing to opt out of.",
+          "To mute the update check: export NO_UPDATE_NOTIFIER=1, or npm config set update-notifier false.",
+          "Use --no-audit and --no-fund to stop the extra registry calls on install."
+        ],
+        "commands": [
+          "npm config set update-notifier false"
+        ],
+        "env": {
+          "NO_UPDATE_NOTIFIER": "1"
+        }
+      },
+      "docs": "https://docs.npmjs.com/cli/v10/using-npm/config#update-notifier"
+    },
+    {
+      "id": "yarn",
+      "name": "Yarn (Berry, v2+)",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous usage counts of the packages you install.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "yarn"
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "files": [
+            "{home}/.yarnrc.yml",
+            ".yarnrc.yml"
+          ],
+          "disabled_pattern": "^enableTelemetry:\\s*(false|0)",
+          "enabled_pattern": "^enableTelemetry:\\s*(true|1)"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run in the project: yarn config set --home enableTelemetry 0",
+          "Or add enableTelemetry: false to ~/.yarnrc.yml."
+        ],
+        "commands": [
+          "yarn config set --home enableTelemetry 0"
+        ],
+        "env": {}
+      },
+      "docs": "https://yarnpkg.com/advanced/telemetry"
+    },
+    {
+      "id": "pnpm",
+      "name": "pnpm",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "No telemetry.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "pnpm"
+        ]
+      },
+      "checks": [],
+      "disable": {
+        "steps": [
+          "Nothing to turn off."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://pnpm.io/"
+    },
+    {
+      "id": "dotnet",
+      "name": ".NET SDK / CLI",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "The dotnet command sends command name, timing, OS and hardware data to Microsoft.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "dotnet"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "DOTNET_CLI_TELEMETRY_OPTOUT",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set DOTNET_CLI_TELEMETRY_OPTOUT=1 in the environment of every shell and build agent."
+        ],
+        "commands": [],
+        "env": {
+          "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
+        }
+      },
+      "docs": "https://learn.microsoft.com/dotnet/core/tools/telemetry"
+    },
+    {
+      "id": "powershell",
+      "name": "PowerShell (7+)",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends the OS name and PowerShell version at start up to Microsoft.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "pwsh"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "POWERSHELL_TELEMETRY_OPTOUT",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set POWERSHELL_TELEMETRY_OPTOUT=1 before PowerShell starts."
+        ],
+        "commands": [],
+        "env": {
+          "POWERSHELL_TELEMETRY_OPTOUT": "1"
+        }
+      },
+      "docs": "https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_telemetry"
+    },
+    {
+      "id": "go",
+      "name": "Go toolchain",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Go 1.23+ keeps counter files on disk (mode local). Uploads only happen if you opt in with mode on.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "go"
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "files": [
+            "{config}/go/telemetry/mode",
+            "{home}/Library/Application Support/go/telemetry/mode"
+          ],
+          "disabled_pattern": "^off",
+          "enabled_pattern": "^on"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: go telemetry off (this also deletes the local counter files)."
+        ],
+        "commands": [
+          "go telemetry off"
+        ],
+        "env": {}
+      },
+      "docs": "https://go.dev/doc/telemetry"
+    },
+    {
+      "id": "winget",
+      "name": "winget",
+      "category": "package-managers",
+      "platforms": [
+        "windows"
+      ],
+      "what": "Sends usage events to Microsoft.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "winget"
+        ],
+        "paths": [
+          "{localappdata}/Packages/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe/LocalState/settings.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetry.disable",
+          "files": [
+            "{localappdata}/Packages/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe/LocalState/settings.json"
+          ],
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: winget settings, then add \"telemetry\": { \"disable\": true }.",
+          "Windows wide diagnostic data settings also apply."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://learn.microsoft.com/windows/package-manager/winget/settings"
+    },
+    {
+      "id": "composer",
+      "name": "Composer",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "No telemetry. Packagist sees the package requests it serves.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "composer"
+        ]
+      },
+      "checks": [],
+      "disable": {
+        "steps": [
+          "Nothing to turn off."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://getcomposer.org/"
+    },
+    {
+      "id": "cargo",
+      "name": "Rust (cargo, rustup)",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "No telemetry in the toolchain.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "cargo",
+          "rustup"
+        ]
+      },
+      "checks": [],
+      "disable": {
+        "steps": [
+          "Nothing to turn off."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://www.rust-lang.org/"
+    },
+    {
+      "id": "deno",
+      "name": "Deno",
+      "category": "package-managers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "No telemetry by default. Deno only sends OpenTelemetry data if you start it with OTEL_DENO=1.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "deno"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "OTEL_DENO",
+          "enabled_when": [
+            "*truthy*"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Leave OTEL_DENO unset."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://docs.deno.com/runtime/fundamentals/open_telemetry/"
+    },
+    {
+      "id": "nextjs",
+      "name": "Next.js",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Records build and dev commands, feature use, and general machine data for Vercel.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "{config}/nextjs-nodejs/config.json",
+          "{home}/Library/Preferences/nextjs-nodejs/config.json",
+          "node_modules/next"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "NEXT_TELEMETRY_DISABLED",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "telemetry.enabled",
+          "files": [
+            "{config}/nextjs-nodejs/config.json",
+            "{home}/Library/Preferences/nextjs-nodejs/config.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: npx next telemetry disable",
+          "In CI set NEXT_TELEMETRY_DISABLED=1."
+        ],
+        "commands": [
+          "npx next telemetry disable"
+        ],
+        "env": {
+          "NEXT_TELEMETRY_DISABLED": "1"
+        }
+      },
+      "docs": "https://nextjs.org/telemetry"
+    },
+    {
+      "id": "gatsby",
+      "name": "Gatsby",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends build timings, plugin names and machine data.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "{config}/gatsby/config.json",
+          "node_modules/gatsby"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "GATSBY_TELEMETRY_DISABLED",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "telemetry.enabled",
+          "files": [
+            "{config}/gatsby/config.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: npx gatsby telemetry --disable",
+          "In CI set GATSBY_TELEMETRY_DISABLED=1."
+        ],
+        "commands": [
+          "npx gatsby telemetry --disable"
+        ],
+        "env": {
+          "GATSBY_TELEMETRY_DISABLED": "1"
+        }
+      },
+      "docs": "https://www.gatsbyjs.com/docs/telemetry/"
+    },
+    {
+      "id": "nuxt",
+      "name": "Nuxt",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous build and module usage data.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "node_modules/nuxt",
+          "{home}/.nuxtrc"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "NUXT_TELEMETRY_DISABLED",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "regex",
+          "files": [
+            "{home}/.nuxtrc"
+          ],
+          "disabled_pattern": "^telemetry\\.enabled\\s*=\\s*false",
+          "enabled_pattern": "^telemetry\\.enabled\\s*=\\s*true"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: npx nuxt telemetry disable",
+          "Or set telemetry: false in nuxt.config.ts.",
+          "In CI set NUXT_TELEMETRY_DISABLED=1."
+        ],
+        "commands": [
+          "npx nuxt telemetry disable"
+        ],
+        "env": {
+          "NUXT_TELEMETRY_DISABLED": "1"
+        }
+      },
+      "docs": "https://github.com/nuxt/telemetry"
+    },
+    {
+      "id": "astro",
+      "name": "Astro",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous data about the config and integrations you build with.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "node_modules/astro",
+          "{config}/astro-nodejs/config.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "ASTRO_TELEMETRY_DISABLED",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "astro.telemetry.enabled",
+          "files": [
+            "{config}/astro-nodejs/config.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: npx astro telemetry disable",
+          "In CI set ASTRO_TELEMETRY_DISABLED=1."
+        ],
+        "commands": [
+          "npx astro telemetry disable"
+        ],
+        "env": {
+          "ASTRO_TELEMETRY_DISABLED": "1"
+        }
+      },
+      "docs": "https://astro.build/telemetry/"
+    },
+    {
+      "id": "angular",
+      "name": "Angular CLI",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends command usage and build data to Google Analytics.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "ng"
+        ],
+        "paths": [
+          "{home}/.angular-config.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "NG_CLI_ANALYTICS",
+          "disabled_when": [
+            "false",
+            "ci",
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "cli.analytics",
+          "files": [
+            "{home}/.angular-config.json",
+            "angular.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: ng analytics disable --global",
+          "In CI set NG_CLI_ANALYTICS=false."
+        ],
+        "commands": [
+          "ng analytics disable --global"
+        ],
+        "env": {
+          "NG_CLI_ANALYTICS": "false"
+        }
+      },
+      "docs": "https://angular.dev/cli/analytics"
+    },
+    {
+      "id": "storybook",
+      "name": "Storybook",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous usage of builders, framework and addons.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "node_modules/storybook",
+          "node_modules/@storybook",
+          ".storybook"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "STORYBOOK_DISABLE_TELEMETRY",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "regex",
+          "files": [
+            ".storybook/main.js",
+            ".storybook/main.ts"
+          ],
+          "disabled_pattern": "disableTelemetry:\\s*true"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Add core: { disableTelemetry: true } to .storybook/main.js.",
+          "In CI set STORYBOOK_DISABLE_TELEMETRY=1."
+        ],
+        "commands": [],
+        "env": {
+          "STORYBOOK_DISABLE_TELEMETRY": "1"
+        }
+      },
+      "docs": "https://storybook.js.org/docs/configure/telemetry"
+    },
+    {
+      "id": "turborepo",
+      "name": "Turborepo",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command and feature usage to Vercel.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "turbo"
+        ],
+        "paths": [
+          "node_modules/turbo",
+          "{config}/turborepo/telemetry.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "TURBO_TELEMETRY_DISABLED",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "telemetry_enabled",
+          "files": [
+            "{config}/turborepo/telemetry.json",
+            "{home}/Library/Application Support/turborepo/telemetry.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: turbo telemetry disable",
+          "In CI set TURBO_TELEMETRY_DISABLED=1."
+        ],
+        "commands": [
+          "turbo telemetry disable"
+        ],
+        "env": {
+          "TURBO_TELEMETRY_DISABLED": "1"
+        }
+      },
+      "docs": "https://turborepo.com/docs/telemetry"
+    },
+    {
+      "id": "strapi",
+      "name": "Strapi",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous project and usage events.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "node_modules/@strapi"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "STRAPI_TELEMETRY_DISABLED",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "strapi.telemetryDisabled",
+          "files": [
+            "package.json"
+          ],
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Add \"telemetryDisabled\": true under the \"strapi\" key of package.json.",
+          "Or set STRAPI_TELEMETRY_DISABLED=1."
+        ],
+        "commands": [],
+        "env": {
+          "STRAPI_TELEMETRY_DISABLED": "1"
+        }
+      },
+      "docs": "https://docs.strapi.io/cms/data-management/telemetry"
+    },
+    {
+      "id": "redwood",
+      "name": "RedwoodJS",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous CLI command and error data.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "node_modules/@redwoodjs"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "REDWOOD_DISABLE_TELEMETRY",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set REDWOOD_DISABLE_TELEMETRY=1, or pass --no-telemetry to the CLI."
+        ],
+        "commands": [],
+        "env": {
+          "REDWOOD_DISABLE_TELEMETRY": "1"
+        }
+      },
+      "docs": "https://redwoodjs.com/docs/telemetry"
+    },
+    {
+      "id": "expo",
+      "name": "Expo / EAS CLI",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous CLI usage events.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "expo",
+          "eas"
+        ],
+        "paths": [
+          "node_modules/expo"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "EXPO_NO_TELEMETRY",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set EXPO_NO_TELEMETRY=1 in your shell profile and in CI."
+        ],
+        "commands": [],
+        "env": {
+          "EXPO_NO_TELEMETRY": "1"
+        }
+      },
+      "docs": "https://docs.expo.dev/"
+    },
+    {
+      "id": "ionic",
+      "name": "Ionic CLI",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command usage.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "ionic"
+        ],
+        "paths": [
+          "{home}/.ionic/config.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetry",
+          "files": [
+            "{home}/.ionic/config.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: ionic config set -g telemetry false"
+        ],
+        "commands": [
+          "ionic config set -g telemetry false"
+        ],
+        "env": {}
+      },
+      "docs": "https://ionicframework.com/docs/cli/telemetry"
+    },
+    {
+      "id": "cordova",
+      "name": "Apache Cordova",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command usage to Google Analytics.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "cordova"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetry",
+          "files": [
+            "{home}/.cordova/config.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: cordova telemetry off"
+        ],
+        "commands": [
+          "cordova telemetry off"
+        ],
+        "env": {}
+      },
+      "docs": "https://cordova.apache.org/docs/en/latest/reference/cordova-cli/#cordova-telemetry-command"
+    },
+    {
+      "id": "flutter",
+      "name": "Flutter / Dart SDK",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends command usage and crash data to Google.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "flutter",
+          "dart"
+        ],
+        "paths": [
+          "{home}/.dart-tool",
+          "{home}/.flutter"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "FLUTTER_SUPPRESS_ANALYTICS",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "regex",
+          "files": [
+            "{home}/.dart-tool/dart-flutter-telemetry.config"
+          ],
+          "disabled_pattern": "^reporting=0",
+          "enabled_pattern": "^reporting=1"
+        },
+        {
+          "type": "json",
+          "key": "enabled",
+          "files": [
+            "{home}/.flutter"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: flutter --disable-analytics",
+          "Run: dart --disable-analytics",
+          "In CI set FLUTTER_SUPPRESS_ANALYTICS=true."
+        ],
+        "commands": [
+          "flutter --disable-analytics",
+          "dart --disable-analytics"
+        ],
+        "env": {
+          "FLUTTER_SUPPRESS_ANALYTICS": "true"
+        }
+      },
+      "docs": "https://docs.flutter.dev/reference/crash-reporting"
+    },
+    {
+      "id": "prisma",
+      "name": "Prisma",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Uses the HashiCorp checkpoint client for version checks, which sends a request with machine data.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "node_modules/prisma",
+          "node_modules/@prisma"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "CHECKPOINT_DISABLE",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set CHECKPOINT_DISABLE=1 in your shell profile and in CI."
+        ],
+        "commands": [],
+        "env": {
+          "CHECKPOINT_DISABLE": "1"
+        }
+      },
+      "docs": "https://www.prisma.io/docs/orm/more/help-and-troubleshooting/prisma-cli-telemetry"
+    },
+    {
+      "id": "cypress",
+      "name": "Cypress",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends crash reports and exception data during test runs.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "cypress"
+        ],
+        "paths": [
+          "node_modules/cypress"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "CYPRESS_CRASH_REPORTS",
+          "disabled_when": [
+            "0",
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "1",
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set CYPRESS_CRASH_REPORTS=0.",
+          "Set CYPRESS_COMMERCIAL_RECOMMENDATIONS=0 to mute the product prompts."
+        ],
+        "commands": [],
+        "env": {
+          "CYPRESS_CRASH_REPORTS": "0"
+        }
+      },
+      "docs": "https://docs.cypress.io/app/references/advanced-installation"
+    },
+    {
+      "id": "playwright",
+      "name": "Playwright",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "No usage telemetry. It does download browser builds from a Microsoft CDN.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "playwright"
+        ],
+        "paths": [
+          "node_modules/@playwright"
+        ]
+      },
+      "checks": [],
+      "disable": {
+        "steps": [
+          "Nothing to turn off."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://playwright.dev/"
+    },
+    {
+      "id": "vite",
+      "name": "Vite",
+      "category": "frameworks",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "No telemetry.",
+      "default_state": "off",
+      "detect": {
+        "which": [
+          "vite"
+        ],
+        "paths": [
+          "node_modules/vite"
+        ]
+      },
+      "checks": [],
+      "disable": {
+        "steps": [
+          "Nothing to turn off."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://vite.dev/"
+    },
+    {
+      "id": "terraform",
+      "name": "Terraform",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "The HashiCorp checkpoint service gets a version check with an anonymous machine ID on most commands.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "terraform"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "CHECKPOINT_DISABLE",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "regex",
+          "files": [
+            "{home}/.terraformrc",
+            "{appdata}/terraform.rc"
+          ],
+          "disabled_pattern": "disable_checkpoint\\s*=\\s*true"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Add disable_checkpoint = true to ~/.terraformrc.",
+          "Or set CHECKPOINT_DISABLE=1."
+        ],
+        "commands": [],
+        "env": {
+          "CHECKPOINT_DISABLE": "1"
+        }
+      },
+      "docs": "https://developer.hashicorp.com/terraform/cli/commands#disable_checkpoint"
+    },
+    {
+      "id": "packer",
+      "name": "Packer",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Same HashiCorp checkpoint version call as Terraform.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "packer"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "CHECKPOINT_DISABLE",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set CHECKPOINT_DISABLE=1."
+        ],
+        "commands": [],
+        "env": {
+          "CHECKPOINT_DISABLE": "1"
+        }
+      },
+      "docs": "https://developer.hashicorp.com/packer/docs/configure"
+    },
+    {
+      "id": "vagrant",
+      "name": "Vagrant",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Checks for updates through the HashiCorp checkpoint service.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "vagrant"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "VAGRANT_CHECKPOINT_DISABLE",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set VAGRANT_CHECKPOINT_DISABLE=1."
+        ],
+        "commands": [],
+        "env": {
+          "VAGRANT_CHECKPOINT_DISABLE": "1"
+        }
+      },
+      "docs": "https://developer.hashicorp.com/vagrant/docs/other/environmental-variables"
+    },
+    {
+      "id": "gcloud",
+      "name": "Google Cloud CLI (gcloud)",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command usage to Google.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "gcloud"
+        ],
+        "paths": [
+          "{home}/.config/gcloud"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "CLOUDSDK_CORE_DISABLE_USAGE_REPORTING",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "ini",
+          "section": "core",
+          "key": "disable_usage_reporting",
+          "files": [
+            "{home}/.config/gcloud/configurations/config_default"
+          ],
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: gcloud config set disable_usage_reporting true",
+          "In CI set CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true."
+        ],
+        "commands": [
+          "gcloud config set disable_usage_reporting true"
+        ],
+        "env": {
+          "CLOUDSDK_CORE_DISABLE_USAGE_REPORTING": "true"
+        }
+      },
+      "docs": "https://cloud.google.com/sdk/docs/usage-statistics"
+    },
+    {
+      "id": "azure-cli",
+      "name": "Azure CLI",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends command name, parameters used, errors and timing to Microsoft.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "az"
+        ],
+        "paths": [
+          "{home}/.azure"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "AZURE_CORE_COLLECT_TELEMETRY",
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        },
+        {
+          "type": "ini",
+          "section": "core",
+          "key": "collect_telemetry",
+          "files": [
+            "{home}/.azure/config"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: az config set core.collect_telemetry=no",
+          "In CI set AZURE_CORE_COLLECT_TELEMETRY=0."
+        ],
+        "commands": [
+          "az config set core.collect_telemetry=no"
+        ],
+        "env": {
+          "AZURE_CORE_COLLECT_TELEMETRY": "0"
+        }
+      },
+      "docs": "https://learn.microsoft.com/cli/azure/azure-cli-configuration"
+    },
+    {
+      "id": "aws-sam",
+      "name": "AWS SAM CLI",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends command usage and error data to AWS.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "sam"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "SAM_CLI_TELEMETRY",
+          "disabled_when": [
+            "0",
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "1",
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set SAM_CLI_TELEMETRY=0."
+        ],
+        "commands": [],
+        "env": {
+          "SAM_CLI_TELEMETRY": "0"
+        }
+      },
+      "docs": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-telemetry.html"
+    },
+    {
+      "id": "aws-cdk",
+      "name": "AWS CDK",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Version reporting adds a CDKMetadata resource to every stack, which tells AWS which constructs you use.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "cdk"
+        ],
+        "paths": [
+          "node_modules/aws-cdk-lib",
+          "cdk.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "versionReporting",
+          "files": [
+            "cdk.json",
+            "{home}/.cdk.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set \"versionReporting\": false in cdk.json.",
+          "Or pass --no-version-reporting to each cdk command."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://docs.aws.amazon.com/cdk/v2/guide/cli.html"
+    },
+    {
+      "id": "serverless",
+      "name": "Serverless Framework",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command and service data.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "serverless",
+          "sls"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "SLS_TELEMETRY_DISABLED",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: serverless slstats --disable",
+          "Or set SLS_TELEMETRY_DISABLED=1."
+        ],
+        "commands": [
+          "serverless slstats --disable"
+        ],
+        "env": {
+          "SLS_TELEMETRY_DISABLED": "1"
+        }
+      },
+      "docs": "https://www.serverless.com/framework/docs/guides/telemetry"
+    },
+    {
+      "id": "netlify-cli",
+      "name": "Netlify CLI",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command usage.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "netlify",
+          "ntl"
+        ],
+        "paths": [
+          "{home}/.netlify"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetryDisabled",
+          "files": [
+            "{config}/netlify/config.json",
+            "{home}/Library/Preferences/netlify/config.json"
+          ],
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: netlify --telemetry-disable"
+        ],
+        "commands": [
+          "netlify --telemetry-disable"
+        ],
+        "env": {}
+      },
+      "docs": "https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/"
+    },
+    {
+      "id": "vercel-cli",
+      "name": "Vercel CLI",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command usage to Vercel.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "vercel",
+          "vc"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "VERCEL_TELEMETRY_DISABLED",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: vercel telemetry disable",
+          "In CI set VERCEL_TELEMETRY_DISABLED=1."
+        ],
+        "commands": [
+          "vercel telemetry disable"
+        ],
+        "env": {
+          "VERCEL_TELEMETRY_DISABLED": "1"
+        }
+      },
+      "docs": "https://vercel.com/docs/cli/about-telemetry"
+    },
+    {
+      "id": "firebase-cli",
+      "name": "Firebase CLI",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous CLI usage to Google Analytics.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "firebase"
+        ],
+        "paths": [
+          "{config}/configstore/firebase-tools.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "usage",
+          "files": [
+            "{config}/configstore/firebase-tools.json",
+            "{home}/.config/configstore/firebase-tools.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: firebase logout, then answer No to usage reporting on the next login.",
+          "Or set \"usage\": false in the configstore file.",
+          "Pass --no-analytics per command."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://firebase.google.com/support/privacy"
+    },
+    {
+      "id": "wrangler",
+      "name": "Cloudflare Wrangler",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command usage to Cloudflare.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "wrangler"
+        ],
+        "paths": [
+          "node_modules/wrangler"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "WRANGLER_SEND_METRICS",
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "permission.enabled",
+          "files": [
+            "{config}/.wrangler/metrics.json",
+            "{home}/Library/Preferences/.wrangler/metrics.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: wrangler telemetry disable",
+          "In CI set WRANGLER_SEND_METRICS=false."
+        ],
+        "commands": [
+          "wrangler telemetry disable"
+        ],
+        "env": {
+          "WRANGLER_SEND_METRICS": "false"
+        }
+      },
+      "docs": "https://developers.cloudflare.com/workers/wrangler/telemetry/"
+    },
+    {
+      "id": "stripe-cli",
+      "name": "Stripe CLI",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous command usage to Stripe.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "stripe"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "STRIPE_CLI_TELEMETRY_OPTOUT",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set STRIPE_CLI_TELEMETRY_OPTOUT=1."
+        ],
+        "commands": [],
+        "env": {
+          "STRIPE_CLI_TELEMETRY_OPTOUT": "1"
+        }
+      },
+      "docs": "https://docs.stripe.com/stripe-cli"
+    },
+    {
+      "id": "salesforce-cli",
+      "name": "Salesforce CLI (sf)",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends command usage and error data to Salesforce.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "sf",
+          "sfdx"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "SF_DISABLE_TELEMETRY",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "env",
+          "var": "SFDX_DISABLE_TELEMETRY",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: sf config set disable-telemetry=true --global",
+          "Or set SF_DISABLE_TELEMETRY=true."
+        ],
+        "commands": [
+          "sf config set disable-telemetry=true --global"
+        ],
+        "env": {
+          "SF_DISABLE_TELEMETRY": "true"
+        }
+      },
+      "docs": "https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_dev_cli_telemetry.htm"
+    },
+    {
+      "id": "snyk",
+      "name": "Snyk CLI",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous analytics about CLI runs.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "snyk"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "SNYK_DISABLE_ANALYTICS",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "disable-analytics",
+          "files": [
+            "{home}/.config/configstore/snyk.json"
+          ],
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Run: snyk config set disable-analytics=1",
+          "Or set SNYK_DISABLE_ANALYTICS=1."
+        ],
+        "commands": [
+          "snyk config set disable-analytics=1"
+        ],
+        "env": {
+          "SNYK_DISABLE_ANALYTICS": "1"
+        }
+      },
+      "docs": "https://docs.snyk.io/snyk-cli/commands/config"
+    },
+    {
+      "id": "hasura",
+      "name": "Hasura CLI / GraphQL Engine",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous usage of the CLI, console and server.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "hasura"
+        ],
+        "paths": [
+          "{home}/.hasura"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "HASURA_GRAPHQL_ENABLE_TELEMETRY",
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "enable_telemetry",
+          "files": [
+            "{home}/.hasura/config.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "CLI: set enable_telemetry: false in ~/.hasura/config.json.",
+          "Server: set HASURA_GRAPHQL_ENABLE_TELEMETRY=false."
+        ],
+        "commands": [],
+        "env": {
+          "HASURA_GRAPHQL_ENABLE_TELEMETRY": "false"
+        }
+      },
+      "docs": "https://hasura.io/docs/2.0/policies/telemetry/"
+    },
+    {
+      "id": "mongosh",
+      "name": "MongoDB Shell (mongosh)",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends anonymous usage events to MongoDB.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "mongosh"
+        ],
+        "paths": [
+          "{home}/.mongodb/mongosh"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "enableTelemetry",
+          "files": [
+            "{home}/.mongodb/mongosh/config"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "In mongosh run: disableTelemetry()"
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://www.mongodb.com/docs/mongodb-shell/telemetry/"
+    },
+    {
+      "id": "docker-desktop",
+      "name": "Docker Desktop",
+      "category": "cloud-cli",
+      "platforms": [
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "what": "Sends usage statistics and crash reports to Docker.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "{home}/.docker/desktop/settings.json",
+          "{home}/.docker/desktop/settings-store.json",
+          "{home}/Library/Group Containers/group.com.docker/settings.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "analyticsEnabled",
+          "files": [
+            "{home}/.docker/desktop/settings.json",
+            "{home}/.docker/desktop/settings-store.json",
+            "{home}/Library/Group Containers/group.com.docker/settings.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Docker Desktop > Settings > General: clear \"Send usage statistics\".",
+          "Fleet wide: set analyticsEnabled to false in the settings JSON, or use the admin settings file."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://docs.docker.com/desktop/settings-and-maintenance/settings/"
+    },
+    {
+      "id": "docker-cli-hints",
+      "name": "Docker CLI (hints and Scout)",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "The CLI prints Docker Scout hints and checks for advice, which contacts Docker.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "docker"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "DOCKER_CLI_HINTS",
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "hints",
+          "files": [
+            "{home}/.docker/config.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set \"hints\": false in ~/.docker/config.json, or export DOCKER_CLI_HINTS=false."
+        ],
+        "commands": [],
+        "env": {
+          "DOCKER_CLI_HINTS": "false"
+        }
+      },
+      "docs": "https://docs.docker.com/reference/cli/docker/"
+    },
+    {
+      "id": "grafana",
+      "name": "Grafana (self hosted)",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Reports anonymous usage statistics and checks for updates.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "grafana",
+          "grafana-server"
+        ],
+        "paths": [
+          "/etc/grafana/grafana.ini"
+        ]
+      },
+      "checks": [
+        {
+          "type": "ini",
+          "section": "analytics",
+          "key": "reporting_enabled",
+          "files": [
+            "/etc/grafana/grafana.ini",
+            "{home}/.grafana/grafana.ini"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "In grafana.ini set [analytics] reporting_enabled = false, check_for_updates = false and check_for_plugin_updates = false."
+        ],
+        "commands": [],
+        "env": {
+          "GF_ANALYTICS_REPORTING_ENABLED": "false"
+        }
+      },
+      "docs": "https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/"
+    },
+    {
+      "id": "netdata",
+      "name": "Netdata",
+      "category": "cloud-cli",
+      "platforms": [
+        "linux"
+      ],
+      "what": "Sends anonymous usage statistics from the agent.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "netdata"
+        ],
+        "paths": [
+          "/etc/netdata"
+        ]
+      },
+      "checks": [
+        {
+          "type": "file",
+          "files": [
+            "/etc/netdata/.opt-out-from-anonymous-statistics"
+          ],
+          "present": "disabled"
+        },
+        {
+          "type": "env",
+          "var": "DISABLE_TELEMETRY",
+          "disabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Create the file /etc/netdata/.opt-out-from-anonymous-statistics and restart netdata.",
+          "Or install with the --disable-telemetry flag."
+        ],
+        "commands": [
+          "touch /etc/netdata/.opt-out-from-anonymous-statistics"
+        ],
+        "env": {
+          "DISABLE_TELEMETRY": "1"
+        }
+      },
+      "docs": "https://learn.netdata.cloud/docs/netdata-agent/configuration/anonymous-telemetry-events"
+    },
+    {
+      "id": "firefox",
+      "name": "Mozilla Firefox",
+      "category": "browsers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends technical and interaction data (Telemetry), plus crash reports and Firefox Suggest data.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "firefox"
+        ],
+        "paths": [
+          "{home}/.mozilla/firefox",
+          "{home}/Library/Application Support/Firefox",
+          "{appdata}/Mozilla/Firefox"
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "files": [
+            "{home}/.mozilla/firefox/*/prefs.js",
+            "{home}/Library/Application Support/Firefox/Profiles/*/prefs.js",
+            "{appdata}/Mozilla/Firefox/Profiles/*/prefs.js"
+          ],
+          "disabled_pattern": "user_pref\\(\"datareporting\\.healthreport\\.uploadEnabled\",\\s*false\\)",
+          "enabled_pattern": "user_pref\\(\"datareporting\\.healthreport\\.uploadEnabled\",\\s*true\\)"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Settings > Privacy & Security > Firefox Data Collection and Use: clear every box.",
+          "Fleet wide: set DisableTelemetry to true in the policies.json enterprise policy."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://support.mozilla.org/kb/telemetry-clientid"
+    },
+    {
+      "id": "chrome",
+      "name": "Google Chrome",
+      "category": "browsers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Usage statistics and crash reports go to Google when the metrics option is on.",
+      "default_state": "unknown",
+      "detect": {
+        "paths": [
+          "{config}/google-chrome/Local State",
+          "{home}/Library/Application Support/Google/Chrome/Local State",
+          "{localappdata}/Google/Chrome/User Data/Local State"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "user_experience_metrics.reporting_enabled",
+          "files": [
+            "{config}/google-chrome/Local State",
+            "{home}/Library/Application Support/Google/Chrome/Local State",
+            "{localappdata}/Google/Chrome/User Data/Local State"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Settings > You and Google > Sync and Google services: turn off \"Help improve Chrome's features and performance\".",
+          "Fleet wide: set the MetricsReportingEnabled policy to false."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://chromeenterprise.google/policies/#MetricsReportingEnabled"
+    },
+    {
+      "id": "brave",
+      "name": "Brave",
+      "category": "browsers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "P3A privacy preserving analytics and crash reports. No Google metrics.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "{config}/BraveSoftware/Brave-Browser/Local State",
+          "{home}/Library/Application Support/BraveSoftware/Brave-Browser/Local State",
+          "{localappdata}/BraveSoftware/Brave-Browser/User Data/Local State"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "brave.p3a.enabled",
+          "files": [
+            "{config}/BraveSoftware/Brave-Browser/Local State",
+            "{home}/Library/Application Support/BraveSoftware/Brave-Browser/Local State",
+            "{localappdata}/BraveSoftware/Brave-Browser/User Data/Local State"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Settings > Privacy and security: turn off product analytics (P3A), diagnostic reports and daily usage ping."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://brave.com/privacy/browser/"
+    },
+    {
+      "id": "edge",
+      "name": "Microsoft Edge",
+      "category": "browsers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends browsing and usage diagnostic data to Microsoft.",
+      "default_state": "unknown",
+      "detect": {
+        "paths": [
+          "{config}/microsoft-edge/Local State",
+          "{home}/Library/Application Support/Microsoft Edge/Local State",
+          "{localappdata}/Microsoft/Edge/User Data/Local State"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "user_experience_metrics.reporting_enabled",
+          "files": [
+            "{config}/microsoft-edge/Local State",
+            "{home}/Library/Application Support/Microsoft Edge/Local State",
+            "{localappdata}/Microsoft/Edge/User Data/Local State"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Settings > Privacy, search, and services: turn off the optional diagnostic data and personalization options.",
+          "Fleet wide: set the MetricsReportingEnabled policy to false."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://learn.microsoft.com/deployedge/microsoft-edge-policies#metricsreportingenabled"
+    },
+    {
+      "id": "chromium",
+      "name": "Chromium",
+      "category": "browsers",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Most distribution builds ship without the Google metrics keys, but the switch is the same.",
+      "default_state": "unknown",
+      "detect": {
+        "paths": [
+          "{config}/chromium/Local State",
+          "{home}/Library/Application Support/Chromium/Local State"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "user_experience_metrics.reporting_enabled",
+          "files": [
+            "{config}/chromium/Local State",
+            "{home}/Library/Application Support/Chromium/Local State"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Settings > Privacy and security: turn off usage statistics and crash reports."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://www.chromium.org/developers/"
+    },
+    {
+      "id": "macos-analytics",
+      "name": "macOS analytics (Apple)",
+      "category": "operating-system",
+      "platforms": [
+        "macos"
+      ],
+      "what": "Shares Mac analytics, crash data and Siri data with Apple.",
+      "default_state": "unknown",
+      "detect": {
+        "paths": [
+          "/Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist"
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "files": [
+            "/Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist"
+          ],
+          "disabled_pattern": "<key>AutoSubmit</key>\\s*<false/>",
+          "enabled_pattern": "<key>AutoSubmit</key>\\s*<true/>"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "System Settings > Privacy & Security > Analytics & Improvements: turn off every option."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://support.apple.com/guide/mac-help/share-analytics-information-mac-apple-mh27990/mac"
+    },
+    {
+      "id": "ubuntu-apport",
+      "name": "Ubuntu crash reports (apport / whoopsie)",
+      "category": "operating-system",
+      "platforms": [
+        "linux"
+      ],
+      "what": "apport collects crash data and whoopsie uploads it to Canonical.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "/etc/default/apport"
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "files": [
+            "/etc/default/apport"
+          ],
+          "disabled_pattern": "^enabled=0",
+          "enabled_pattern": "^enabled=1"
+        },
+        {
+          "type": "regex",
+          "files": [
+            "/etc/default/whoopsie"
+          ],
+          "disabled_pattern": "report_crashes=false",
+          "enabled_pattern": "report_crashes=true"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set enabled=0 in /etc/default/apport and run: sudo systemctl stop apport",
+          "Set report_crashes=false in /etc/default/whoopsie, or remove the whoopsie package.",
+          "Run: ubuntu-report send no"
+        ],
+        "commands": [
+          "sudo systemctl disable --now apport whoopsie",
+          "ubuntu-report send no"
+        ],
+        "env": {}
+      },
+      "docs": "https://wiki.ubuntu.com/Apport"
+    },
+    {
+      "id": "windows-telemetry",
+      "name": "Windows diagnostic data",
+      "category": "operating-system",
+      "platforms": [
+        "windows"
+      ],
+      "what": "Windows sends required and optional diagnostic data to Microsoft.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "C:/Windows/System32"
+        ]
+      },
+      "checks": [
+        {
+          "type": "manual"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Settings > Privacy & security > Diagnostics & feedback: turn off optional diagnostic data and tailored experiences.",
+          "Pro and Enterprise: set the Group Policy Allow Telemetry (AllowTelemetry) to the lowest level your edition supports."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://learn.microsoft.com/windows/privacy/configure-windows-diagnostic-data-in-your-organization"
+    },
+    {
+      "id": "syncthing",
+      "name": "Syncthing",
+      "category": "desktop-apps",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Optional anonymous usage reporting to the Syncthing project.",
+      "default_state": "unknown",
+      "detect": {
+        "which": [
+          "syncthing"
+        ],
+        "paths": [
+          "{config}/syncthing/config.xml",
+          "{home}/Library/Application Support/Syncthing/config.xml"
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "files": [
+            "{config}/syncthing/config.xml",
+            "{home}/Library/Application Support/Syncthing/config.xml"
+          ],
+          "disabled_pattern": "<urAccepted>-1</urAccepted>",
+          "enabled_pattern": "<urAccepted>[1-9][0-9]*</urAccepted>"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Web UI > Settings: set Anonymous Usage Reporting to No (this writes urAccepted -1)."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://docs.syncthing.net/users/config.html"
+    },
+    {
+      "id": "insomnia",
+      "name": "Insomnia",
+      "category": "desktop-apps",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends usage analytics to Kong.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "{config}/Insomnia",
+          "{home}/Library/Application Support/Insomnia"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "enableAnalytics",
+          "files": [
+            "{config}/Insomnia/insomnia.Settings.json",
+            "{home}/Library/Application Support/Insomnia/insomnia.Settings.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Preferences > General: clear \"Send usage statistics\" and \"Send error reports\"."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://docs.insomnia.rest/insomnia/application-data"
+    },
+    {
+      "id": "slack",
+      "name": "Slack desktop",
+      "category": "desktop-apps",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Client usage is logged server side. There is no local opt-out switch.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "{config}/Slack",
+          "{home}/Library/Application Support/Slack",
+          "{appdata}/Slack"
+        ]
+      },
+      "checks": [
+        {
+          "type": "manual"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "No local switch. Workspace owners on paid plans control the analytics and retention settings.",
+          "Block third party trackers at the network level if this matters to you."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://slack.com/trust/privacy/privacy-policy"
+    },
+    {
+      "id": "zoom",
+      "name": "Zoom",
+      "category": "desktop-apps",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Product usage and quality data go to Zoom.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "{home}/.zoom",
+          "{home}/Library/Application Support/zoom.us",
+          "{appdata}/Zoom"
+        ]
+      },
+      "checks": [
+        {
+          "type": "manual"
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Zoom web portal > Settings: turn off the product usage and marketing data options your account exposes.",
+          "There is no local file to flip."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://explore.zoom.us/en/privacy/"
+    },
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "category": "ai-tools",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends usage telemetry and error reports to Anthropic.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "claude"
+        ],
+        "paths": [
+          "{home}/.claude"
+        ]
+      },
+      "checks": [
+        {
+          "type": "env",
+          "var": "DISABLE_TELEMETRY",
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        },
+        {
+          "type": "json",
+          "key": "env.DISABLE_TELEMETRY",
+          "files": [
+            "{home}/.claude/settings.json"
+          ],
+          "disabled_when": [
+            "*truthy*"
+          ],
+          "enabled_when": [
+            "*falsy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set DISABLE_TELEMETRY=1, DISABLE_ERROR_REPORTING=1 and DISABLE_BUG_COMMAND=1.",
+          "Or set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 to cover all of them.",
+          "These can also live in the \"env\" block of ~/.claude/settings.json."
+        ],
+        "commands": [],
+        "env": {
+          "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+        }
+      },
+      "docs": "https://docs.claude.com/en/docs/claude-code/settings"
+    },
+    {
+      "id": "gemini-cli",
+      "name": "Gemini CLI",
+      "category": "ai-tools",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Sends usage statistics to Google.",
+      "default_state": "on",
+      "detect": {
+        "which": [
+          "gemini"
+        ],
+        "paths": [
+          "{home}/.gemini"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "usageStatisticsEnabled",
+          "files": [
+            "{home}/.gemini/settings.json"
+          ],
+          "disabled_when": [
+            "*falsy*"
+          ],
+          "enabled_when": [
+            "*truthy*"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Set \"usageStatisticsEnabled\": false in ~/.gemini/settings.json."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://google-gemini.github.io/gemini-cli/docs/telemetry.html"
+    },
+    {
+      "id": "github-copilot",
+      "name": "GitHub Copilot",
+      "category": "ai-tools",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "what": "Code snippets and suggestion events can be kept by GitHub for product improvement.",
+      "default_state": "on",
+      "detect": {
+        "paths": [
+          "{config}/Code/User/settings.json",
+          "{home}/.config/github-copilot",
+          "{home}/Library/Application Support/Code/User/settings.json"
+        ]
+      },
+      "checks": [
+        {
+          "type": "json",
+          "key": "telemetry.telemetryLevel",
+          "files": [
+            "{config}/Code/User/settings.json",
+            "{home}/Library/Application Support/Code/User/settings.json"
+          ],
+          "disabled_when": [
+            "off"
+          ],
+          "enabled_when": [
+            "all",
+            "error",
+            "crash"
+          ]
+        }
+      ],
+      "disable": {
+        "steps": [
+          "Turn off editor telemetry (see the vscode entry).",
+          "In GitHub settings > Copilot, turn off \"Allow GitHub to use my code snippets for product improvements\".",
+          "Organisation owners set the same policy for all members."
+        ],
+        "commands": [],
+        "env": {}
+      },
+      "docs": "https://docs.github.com/copilot/managing-copilot/managing-copilot-as-an-individual-subscriber/managing-your-copilot-policies"
+    }
+  ]
+}

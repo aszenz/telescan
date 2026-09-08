@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telescan"
+version = "1.0.0"
+description = "Scan the applications on your machine and report which ones still send telemetry."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["telemetry", "privacy", "cli", "opt-out", "analytics"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.scripts]
+telescan = "telescan.cli:main"
+
+[tool.setuptools]
+packages = ["telescan"]
+
+[tool.setuptools.package-data]
+telescan = ["data/*.json"]
