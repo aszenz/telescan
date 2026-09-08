@@ -17,7 +17,19 @@ class TestCoverage(TempHome):
     def setUp(self):
         super().setUp()
         self.catalog = Catalog.load()
-        self.env = mock.patch.dict(os.environ, {"HOME": str(self.home), "XDG_CONFIG_HOME": str(self.home / '.config')}, clear=True)
+        self.env = mock.patch.dict(
+            os.environ,
+            {
+                "HOME": str(self.home),
+                "USERPROFILE": str(self.home),
+                "XDG_CONFIG_HOME": str(self.home / ".config"),
+                "XDG_DATA_HOME": str(self.home / ".local" / "share"),
+                "APPDATA": str(self.home / ".config"),
+                "LOCALAPPDATA": str(self.home / ".local" / "share"),
+                "PROGRAMDATA": str(self.home / ".programdata"),
+            },
+            clear=True,
+        )
         self.env.start()
         self.addCleanup(self.env.stop)
         patch = mock.patch('telescan.scanner.shutil.which', return_value=None)
