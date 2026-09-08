@@ -1,0 +1,47 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "cursor",
+  "name": "Cursor",
+  "category": "editors",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "VS Code fork. Sends editor telemetry, plus prompt and code data unless Privacy Mode is on.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "cursor"
+    ],
+    "paths": [
+      "{config}/Cursor/User/settings.json",
+      "{home}/Library/Application Support/Cursor/User/settings.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "telemetry.telemetryLevel",
+      "files": [
+        "{config}/Cursor/User/settings.json",
+        "{home}/Library/Application Support/Cursor/User/settings.json"
+      ],
+      "disabled_when": [
+        "off"
+      ],
+      "enabled_when": [
+        "all",
+        "error",
+        "crash"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set \"telemetry.telemetryLevel\": \"off\" in settings.json.",
+      "Turn on Privacy Mode in Cursor Settings > General to stop code and prompts leaving the machine."
+    ]
+  },
+  "docs": "https://cursor.com/security"
+}

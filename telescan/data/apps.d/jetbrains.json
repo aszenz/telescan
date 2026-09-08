@@ -1,0 +1,39 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "jetbrains",
+  "name": "JetBrains IDEs (IntelliJ, PyCharm, WebStorm, ...)",
+  "category": "editors",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "The Data Sharing option sends feature usage statistics to JetBrains.",
+  "default_state": "unknown",
+  "detect": {
+    "paths": [
+      "{data}/JetBrains",
+      "{home}/Library/Application Support/JetBrains",
+      "{home}/.local/share/JetBrains"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "files": [
+        "{data}/JetBrains/consentOptions/accepted",
+        "{home}/Library/Application Support/JetBrains/consentOptions/accepted",
+        "{home}/.local/share/JetBrains/consentOptions/accepted"
+      ],
+      "disabled_pattern": "rsch\\.send\\.usage\\.stat:[^:]*:0",
+      "enabled_pattern": "rsch\\.send\\.usage\\.stat:[^:]*:1"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > Appearance & Behavior > System Settings > Data Sharing: clear all boxes.",
+      "For a fleet, ship an idea.properties with the Data Sharing consent already declined."
+    ]
+  },
+  "docs": "https://www.jetbrains.com/help/idea/settings-usage-statistics.html"
+}

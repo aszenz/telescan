@@ -1,0 +1,36 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "deno",
+  "name": "Deno",
+  "category": "package-managers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "No telemetry by default. Deno only sends OpenTelemetry data if you start it with OTEL_DENO=1.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "deno"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "OTEL_DENO",
+      "enabled_when": [
+        "*truthy*"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Leave OTEL_DENO unset."
+    ]
+  },
+  "docs": "https://docs.deno.com/runtime/fundamentals/open_telemetry/"
+}

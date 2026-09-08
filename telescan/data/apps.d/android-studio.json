@@ -1,0 +1,40 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "android-studio",
+  "name": "Android Studio / Android SDK tools",
+  "category": "editors",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends usage statistics and crash reports to Google. The setting also covers the SDK command line tools.",
+  "default_state": "unknown",
+  "detect": {
+    "paths": [
+      "{home}/.android"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "hasOptedIn",
+      "files": [
+        "{home}/.android/analytics.settings"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > Appearance & Behavior > System Settings > Data Sharing: clear the box.",
+      "Or set \"hasOptedIn\": false in ~/.android/analytics.settings."
+    ]
+  },
+  "docs": "https://developer.android.com/studio/preview/data-sharing"
+}

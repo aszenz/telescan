@@ -1,0 +1,53 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "nuxt",
+  "name": "Nuxt",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous build and module usage data.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "node_modules/nuxt",
+      "{home}/.nuxtrc"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "NUXT_TELEMETRY_DISABLED",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "regex",
+      "files": [
+        "{home}/.nuxtrc"
+      ],
+      "disabled_pattern": "^telemetry\\.enabled\\s*=\\s*false",
+      "enabled_pattern": "^telemetry\\.enabled\\s*=\\s*true"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: npx nuxt telemetry disable",
+      "Or set telemetry: false in nuxt.config.ts.",
+      "In CI set NUXT_TELEMETRY_DISABLED=1."
+    ],
+    "commands": [
+      "npx nuxt telemetry disable"
+    ],
+    "env": {
+      "NUXT_TELEMETRY_DISABLED": "1"
+    }
+  },
+  "docs": "https://github.com/nuxt/telemetry"
+}

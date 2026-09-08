@@ -1,0 +1,45 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "cypress",
+  "name": "Cypress",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends crash reports and exception data during test runs.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "cypress"
+    ],
+    "paths": [
+      "node_modules/cypress"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "CYPRESS_CRASH_REPORTS",
+      "disabled_when": [
+        "0",
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "1",
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set CYPRESS_CRASH_REPORTS=0.",
+      "Set CYPRESS_COMMERCIAL_RECOMMENDATIONS=0 to mute the product prompts."
+    ],
+    "env": {
+      "CYPRESS_CRASH_REPORTS": "0"
+    }
+  },
+  "docs": "https://docs.cypress.io/app/references/advanced-installation"
+}

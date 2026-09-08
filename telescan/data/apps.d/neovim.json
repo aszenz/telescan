@@ -1,0 +1,26 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "neovim",
+  "name": "Neovim / Vim",
+  "category": "editors",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "No telemetry in the editor. Plugins and language servers can still call home.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "nvim",
+      "vim"
+    ]
+  },
+  "checks": [],
+  "disable": {
+    "steps": [
+      "Nothing to turn off. Audit the plugins and language servers you install."
+    ]
+  },
+  "docs": "https://neovim.io/"
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "homebrew",
+  "name": "Homebrew",
+  "category": "package-managers",
+  "platforms": [
+    "macos",
+    "linux"
+  ],
+  "what": "Sends anonymous install and build events to a Homebrew owned InfluxDB.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "brew"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "HOMEBREW_NO_ANALYTICS",
+      "disabled_when": [
+        "*truthy*"
+      ]
+    },
+    {
+      "type": "command",
+      "argv": [
+        "brew",
+        "analytics",
+        "state"
+      ],
+      "disabled_pattern": "disabled|are not enabled",
+      "enabled_pattern": "are enabled"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: brew analytics off",
+      "Or export HOMEBREW_NO_ANALYTICS=1 in your shell profile."
+    ],
+    "commands": [
+      "brew analytics off"
+    ],
+    "env": {
+      "HOMEBREW_NO_ANALYTICS": "1"
+    }
+  },
+  "docs": "https://docs.brew.sh/Analytics"
+}

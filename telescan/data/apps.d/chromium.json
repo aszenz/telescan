@@ -1,0 +1,41 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "chromium",
+  "name": "Chromium",
+  "category": "browsers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Most distribution builds ship without the Google metrics keys, but the switch is the same.",
+  "default_state": "unknown",
+  "detect": {
+    "paths": [
+      "{config}/chromium/Local State",
+      "{home}/Library/Application Support/Chromium/Local State"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "user_experience_metrics.reporting_enabled",
+      "files": [
+        "{config}/chromium/Local State",
+        "{home}/Library/Application Support/Chromium/Local State"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > Privacy and security: turn off usage statistics and crash reports."
+    ]
+  },
+  "docs": "https://www.chromium.org/developers/"
+}

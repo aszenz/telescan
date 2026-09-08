@@ -1,0 +1,32 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "zoom",
+  "name": "Zoom",
+  "category": "desktop-apps",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Product usage and quality data go to Zoom.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "{home}/.zoom",
+      "{home}/Library/Application Support/zoom.us",
+      "{appdata}/Zoom"
+    ]
+  },
+  "checks": [
+    {
+      "type": "manual"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Zoom web portal > Settings: turn off the product usage and marketing data options your account exposes.",
+      "There is no local file to flip."
+    ]
+  },
+  "docs": "https://explore.zoom.us/en/privacy/"
+}

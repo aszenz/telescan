@@ -1,0 +1,48 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "grafana",
+  "name": "Grafana (self hosted)",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Reports anonymous usage statistics and checks for updates.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "grafana",
+      "grafana-server"
+    ],
+    "paths": [
+      "/etc/grafana/grafana.ini"
+    ]
+  },
+  "checks": [
+    {
+      "type": "ini",
+      "section": "analytics",
+      "key": "reporting_enabled",
+      "files": [
+        "/etc/grafana/grafana.ini",
+        "{home}/.grafana/grafana.ini"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "In grafana.ini set [analytics] reporting_enabled = false, check_for_updates = false and check_for_plugin_updates = false."
+    ],
+    "env": {
+      "GF_ANALYTICS_REPORTING_ENABLED": "false"
+    }
+  },
+  "docs": "https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/"
+}

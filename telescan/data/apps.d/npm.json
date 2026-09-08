@@ -1,0 +1,41 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "npm",
+  "name": "npm",
+  "category": "package-managers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "No usage telemetry. The registry still sees your install requests, and the update notifier calls out on its own.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "npm"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "NO_UPDATE_NOTIFIER",
+      "disabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Nothing to opt out of.",
+      "To mute the update check: export NO_UPDATE_NOTIFIER=1, or npm config set update-notifier false.",
+      "Use --no-audit and --no-fund to stop the extra registry calls on install."
+    ],
+    "commands": [
+      "npm config set update-notifier false"
+    ],
+    "env": {
+      "NO_UPDATE_NOTIFIER": "1"
+    }
+  },
+  "docs": "https://docs.npmjs.com/cli/v10/using-npm/config#update-notifier"
+}

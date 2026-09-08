@@ -1,0 +1,42 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "firefox",
+  "name": "Mozilla Firefox",
+  "category": "browsers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends technical and interaction data (Telemetry), plus crash reports and Firefox Suggest data.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "firefox"
+    ],
+    "paths": [
+      "{home}/.mozilla/firefox",
+      "{home}/Library/Application Support/Firefox",
+      "{appdata}/Mozilla/Firefox"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "files": [
+        "{home}/.mozilla/firefox/*/prefs.js",
+        "{home}/Library/Application Support/Firefox/Profiles/*/prefs.js",
+        "{appdata}/Mozilla/Firefox/Profiles/*/prefs.js"
+      ],
+      "disabled_pattern": "user_pref\\(\"datareporting\\.healthreport\\.uploadEnabled\",\\s*false\\)",
+      "enabled_pattern": "user_pref\\(\"datareporting\\.healthreport\\.uploadEnabled\",\\s*true\\)"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > Privacy & Security > Firefox Data Collection and Use: clear every box.",
+      "Fleet wide: set DisableTelemetry to true in the policies.json enterprise policy."
+    ]
+  },
+  "docs": "https://support.mozilla.org/kb/telemetry-clientid"
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "docker-desktop",
+  "name": "Docker Desktop",
+  "category": "cloud-cli",
+  "platforms": [
+    "macos",
+    "windows",
+    "linux"
+  ],
+  "what": "Sends usage statistics and crash reports to Docker.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "{home}/.docker/desktop/settings.json",
+      "{home}/.docker/desktop/settings-store.json",
+      "{home}/Library/Group Containers/group.com.docker/settings.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "analyticsEnabled",
+      "files": [
+        "{home}/.docker/desktop/settings.json",
+        "{home}/.docker/desktop/settings-store.json",
+        "{home}/Library/Group Containers/group.com.docker/settings.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Docker Desktop > Settings > General: clear \"Send usage statistics\".",
+      "Fleet wide: set analyticsEnabled to false in the settings JSON, or use the admin settings file."
+    ]
+  },
+  "docs": "https://docs.docker.com/desktop/settings-and-maintenance/settings/"
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "vscodium",
+  "name": "VSCodium",
+  "category": "editors",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "VS Code build with the Microsoft telemetry endpoints removed. Extensions can still report on their own.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "codium"
+    ],
+    "paths": [
+      "{config}/VSCodium/User/settings.json",
+      "{home}/Library/Application Support/VSCodium/User/settings.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "telemetry.telemetryLevel",
+      "files": [
+        "{config}/VSCodium/User/settings.json",
+        "{home}/Library/Application Support/VSCodium/User/settings.json"
+      ],
+      "disabled_when": [
+        "off"
+      ],
+      "enabled_when": [
+        "all",
+        "error",
+        "crash"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Telemetry is off in the build. Keep \"telemetry.telemetryLevel\": \"off\" to also mute extensions."
+    ]
+  },
+  "docs": "https://vscodium.com/#telemetry"
+}

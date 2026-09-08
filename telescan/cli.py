@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 from . import report
-from .catalog import Catalog
+from .catalog import DATA_DIR, Catalog
 from .checks import DISABLED, ENABLED, UNKNOWN
 from .paths import current_platform
 from .scanner import MANUAL, scan, scan_app
@@ -22,6 +23,7 @@ examples:
   telescan scan --export-env        print the export lines for your shell profile
   telescan list --category browsers list the catalog entries of one category
   telescan show homebrew            show one entry in full
+  telescan validate                 check the catalog against app.schema.json
 
 exit codes:
   0  nothing to act on
@@ -66,6 +68,10 @@ def build_parser() -> argparse.ArgumentParser:
     show_cmd.add_argument("app", help="catalog ID, for example: vscode")
 
     sub.add_parser("categories", help="list the categories")
+
+    validate_cmd = sub.add_parser("validate", help="check catalog entries against app.schema.json")
+    validate_cmd.add_argument("path", nargs="?",
+                              help="a directory of entries or one JSON file (default: the shipped catalog)")
     return parser
 
 
@@ -160,10 +166,22 @@ def cmd_categories(catalog: Catalog) -> int:
     return 0
 
 
+def cmd_validate(args: argparse.Namespace) -> int:
+    source = Path(args.path) if args.path else DATA_DIR
+    try:
+        catalog = Catalog.load(source)
+    except (OSError, ValueError) as error:
+        report.write(f"invalid: {error}\n", sys.stderr)
+        return 2
+    plural = "entry" if len(catalog) == 1 else "entries"
+    report.write(f"{len(catalog)} {plural} in {source} match app.schema.json.\n")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     parser = build_parser()
-    known = {"scan", "list", "show", "categories"}
+    known = {"scan", "list", "show", "categories", "validate"}
     global_flags = {"-h", "--help", "--version"}
     if not argv or (argv[0] not in known and argv[0] not in global_flags):
         # "telescan" and "telescan --format json" both mean "telescan scan ...".
@@ -171,6 +189,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command is None:
         args = parser.parse_args(["scan"])
+
+    if args.command == "validate":
+        return cmd_validate(args)
 
     try:
         catalog = Catalog.load()

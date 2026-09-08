@@ -1,0 +1,26 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "cargo",
+  "name": "Rust (cargo, rustup)",
+  "category": "package-managers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "No telemetry in the toolchain.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "cargo",
+      "rustup"
+    ]
+  },
+  "checks": [],
+  "disable": {
+    "steps": [
+      "Nothing to turn off."
+    ]
+  },
+  "docs": "https://www.rust-lang.org/"
+}

@@ -13,9 +13,74 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from telescan import checks, paths, report  # noqa: E402
-from telescan.catalog import App, Catalog  # noqa: E402
+from telescan import schema as app_schema  # noqa: E402
+from telescan.catalog import DATA_DIR, App, Catalog  # noqa: E402
 from telescan.cli import main  # noqa: E402
 from telescan.scanner import MANUAL, NOT_INSTALLED, scan_app  # noqa: E402
+
+
+def valid_entry(**overrides) -> dict:
+    entry = {
+        "id": "dup",
+        "name": "Dup",
+        "category": "editors",
+        "platforms": ["linux"],
+        "what": "Sends usage events somewhere.",
+        "detect": {"which": ["dup"]},
+        "checks": [{"type": "env", "var": "DUP_TELEMETRY", "disabled_when": ["1"]}],
+        "disable": {"steps": ["Set DUP_TELEMETRY=1."]},
+        "docs": "https://example.com/telemetry",
+    }
+    entry.update(overrides)
+    return entry
+
+
+def write_entries(entries: list[dict]) -> Path:
+    """Write entries to one temporary file and return its path."""
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+        json.dump({"apps": entries}, handle)
+        return Path(handle.name)
+
+
+class TestSchema(unittest.TestCase):
+    def setUp(self) -> None:
+        self.contract = app_schema.load_schema()
+
+    def test_a_valid_entry_has_no_problems(self) -> None:
+        self.assertEqual(app_schema.validate(valid_entry(), self.contract), [])
+
+    def test_unknown_field_is_rejected(self) -> None:
+        problems = app_schema.validate(valid_entry(surprise=1), self.contract)
+        self.assertIn("unknown field 'surprise'", " ".join(problems))
+
+    def test_check_needs_the_fields_of_its_type(self) -> None:
+        entry = valid_entry(checks=[{"type": "json", "key": "a.b"}])
+        self.assertIn("is missing 'files'", " ".join(app_schema.validate(entry, self.contract)))
+
+    def test_unknown_check_type_is_rejected(self) -> None:
+        entry = valid_entry(checks=[{"type": "carrier-pigeon"}])
+        self.assertTrue(app_schema.validate(entry, self.contract))
+
+    def test_manual_check_needs_nothing_else(self) -> None:
+        self.assertEqual(app_schema.validate(valid_entry(checks=[{"type": "manual"}]), self.contract), [])
+
+    def test_detect_needs_which_or_paths(self) -> None:
+        self.assertTrue(app_schema.validate(valid_entry(detect={}), self.contract))
+        self.assertEqual(app_schema.validate(valid_entry(detect={"paths": ["{home}/x"]}), self.contract), [])
+
+    def test_docs_must_be_https(self) -> None:
+        self.assertTrue(app_schema.validate(valid_entry(docs="http://example.com"), self.contract))
+
+    def test_platform_must_be_known(self) -> None:
+        self.assertTrue(app_schema.validate(valid_entry(platforms=["solaris"]), self.contract))
+
+    def test_duplicate_platform_is_rejected(self) -> None:
+        entry = valid_entry(platforms=["linux", "linux"])
+        self.assertIn("duplicate", " ".join(app_schema.validate(entry, self.contract)))
+
+    def test_types_are_checked(self) -> None:
+        self.assertTrue(app_schema.validate(valid_entry(platforms="linux"), self.contract))
+        self.assertTrue(app_schema.validate(valid_entry(name=True), self.contract))
 
 
 class TempHome(unittest.TestCase):
@@ -162,25 +227,45 @@ class TestCatalog(unittest.TestCase):
                 self.assertTrue(app.detect.get("which") or app.detect.get("paths"),
                                 "no way to detect the app")
 
-    def test_checks_are_well_formed(self) -> None:
-        required = {
-            "env": ["var"], "json": ["key", "files"], "ini": ["key", "files"],
-            "regex": ["files"], "file": ["files"], "command": ["argv"], "manual": [],
-        }
-        for app in self.catalog:
-            for check in app.checks:
-                with self.subTest(app=app.id, check=check["type"]):
-                    self.assertIn(check["type"], required)
-                    for field in required[check["type"]]:
-                        self.assertIn(field, check)
+    def test_one_file_per_app(self) -> None:
+        files = sorted(path.stem for path in DATA_DIR.glob("*.json"))
+        self.assertEqual(files, sorted(app.id for app in self.catalog))
+
+    def test_every_entry_matches_the_schema(self) -> None:
+        contract = app_schema.load_schema()
+        for path in sorted(DATA_DIR.glob("*.json")):
+            with self.subTest(entry=path.stem):
+                entry = json.loads(path.read_text(encoding="utf-8"))
+                self.assertEqual(app_schema.validate(entry, contract), [])
 
     def test_duplicate_ids_are_rejected(self) -> None:
-        entry = {"id": "dup", "name": "Dup", "category": "test", "platforms": ["linux"], "what": "x"}
-        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
-            json.dump({"apps": [entry, dict(entry)]}, handle)
-            name = handle.name
+        with self.assertRaises(ValueError) as raised:
+            Catalog.load(write_entries([valid_entry(), valid_entry()]))
+        self.assertIn("duplicate app id", str(raised.exception))
+
+    def test_a_bad_entry_names_its_file(self) -> None:
+        entry = valid_entry()
+        del entry["docs"]
+        with self.assertRaises(ValueError) as raised:
+            Catalog.load(write_entries([entry]))
+        self.assertIn("is missing 'docs'", str(raised.exception))
+
+    def test_id_must_match_the_file_name(self) -> None:
+        directory = Path(tempfile.mkdtemp())
+        (directory / "other.json").write_text(json.dumps(valid_entry()), encoding="utf-8")
+        with self.assertRaises(ValueError) as raised:
+            Catalog.load(directory)
+        self.assertIn("does not match the file name", str(raised.exception))
+
+    def test_an_empty_directory_is_an_error(self) -> None:
         with self.assertRaises(ValueError):
-            Catalog.load(Path(name))
+            Catalog.load(Path(tempfile.mkdtemp()))
+
+    def test_a_single_file_entry_loads(self) -> None:
+        directory = Path(tempfile.mkdtemp())
+        path = directory / "dup.json"
+        path.write_text(json.dumps(valid_entry()), encoding="utf-8")
+        self.assertEqual(len(Catalog.load(path)), 1)
 
     def test_search_and_filter(self) -> None:
         self.assertTrue(self.catalog.search("code"))
@@ -238,6 +323,15 @@ class TestCli(unittest.TestCase):
     def test_markdown_table(self) -> None:
         _, out = self.run_cli(["scan", "--format", "markdown", "--all"])
         self.assertIn("| Status | Application |", out)
+
+    def test_validate(self) -> None:
+        code, out = self.run_cli(["validate"])
+        self.assertEqual(code, 0)
+        self.assertIn("app.schema.json", out)
+
+    def test_validate_reports_a_bad_entry(self) -> None:
+        path = write_entries([valid_entry(docs="http://example.com")])
+        self.assertEqual(main(["validate", str(path)]), 2)
 
     def test_categories(self) -> None:
         code, out = self.run_cli(["categories"])

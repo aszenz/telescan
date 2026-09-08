@@ -1,0 +1,50 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "storybook",
+  "name": "Storybook",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous usage of builders, framework and addons.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "node_modules/storybook",
+      "node_modules/@storybook",
+      ".storybook"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "STORYBOOK_DISABLE_TELEMETRY",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "regex",
+      "files": [
+        ".storybook/main.js",
+        ".storybook/main.ts"
+      ],
+      "disabled_pattern": "disableTelemetry:\\s*true"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Add core: { disableTelemetry: true } to .storybook/main.js.",
+      "In CI set STORYBOOK_DISABLE_TELEMETRY=1."
+    ],
+    "env": {
+      "STORYBOOK_DISABLE_TELEMETRY": "1"
+    }
+  },
+  "docs": "https://storybook.js.org/docs/configure/telemetry"
+}

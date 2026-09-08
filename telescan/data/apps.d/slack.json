@@ -1,0 +1,32 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "slack",
+  "name": "Slack desktop",
+  "category": "desktop-apps",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Client usage is logged server side. There is no local opt-out switch.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "{config}/Slack",
+      "{home}/Library/Application Support/Slack",
+      "{appdata}/Slack"
+    ]
+  },
+  "checks": [
+    {
+      "type": "manual"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "No local switch. Workspace owners on paid plans control the analytics and retention settings.",
+      "Block third party trackers at the network level if this matters to you."
+    ]
+  },
+  "docs": "https://slack.com/trust/privacy/privacy-policy"
+}

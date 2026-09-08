@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aszenz/telescan/telescan/data/app.schema.json",
+  "title": "Telescan catalog entry",
+  "description": "One application. Put one entry per file in data/apps.d/<id>.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "category", "platforms", "what", "detect", "disable", "docs"],
+  "properties": {
+    "$schema": {
+      "description": "A link to this file, so that an editor can complete and check the entry.",
+      "type": "string"
+    },
+    "id": {
+      "description": "Short lowercase ID, and also the file name. Used on the command line.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "name": {
+      "description": "The name the vendor uses, plus a version note when the entry is version specific.",
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "ai-tools",
+        "browsers",
+        "cloud-cli",
+        "desktop-apps",
+        "editors",
+        "frameworks",
+        "operating-system",
+        "package-managers"
+      ]
+    },
+    "platforms": {
+      "description": "The platforms the entry applies to.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "enum": ["linux", "macos", "windows"] }
+    },
+    "what": {
+      "description": "What the application sends, in one or two sentences.",
+      "type": "string",
+      "minLength": 10
+    },
+    "default_state": {
+      "description": "The state of a fresh install, used when no check finds anything.",
+      "type": "string",
+      "enum": ["on", "off", "unknown"]
+    },
+    "detect": { "$ref": "#/$defs/detect" },
+    "checks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/check" }
+    },
+    "disable": { "$ref": "#/$defs/disable" },
+    "docs": {
+      "description": "A link to the vendor documentation for the opt-out.",
+      "type": "string",
+      "pattern": "^https://",
+      "format": "uri"
+    }
+  },
+  "$defs": {
+    "detect": {
+      "description": "How to tell that the application is installed. Give at least one of the two.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "which": {
+          "description": "Executables to look for on PATH.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "paths": {
+          "description": "Files or directories to look for. Placeholders and globs are allowed.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/path" }
+        }
+      },
+      "anyOf": [{ "required": ["which"] }, { "required": ["paths"] }]
+    },
+    "path": {
+      "description": "A path that may hold the placeholders {home}, {config}, {data}, {appsupport}, {appdata}, {localappdata} or {programdata}, and glob wildcards.",
+      "type": "string",
+      "minLength": 1
+    },
+    "disable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steps"],
+      "properties": {
+        "steps": {
+          "description": "What the user must do, one instruction per item.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "commands": {
+          "description": "Commands that do the same thing, for a copy and paste.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "env": {
+          "description": "Environment variables that turn the telemetry off.",
+          "type": "object",
+          "propertyNames": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "match_list": {
+      "description": "Values to compare against. Use *truthy* or *falsy* for the usual words.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": ["string", "boolean", "number", "null"] }
+    },
+    "check": {
+      "description": "One place to read. The scanner reports the sum of all checks.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["env", "json", "ini", "regex", "file", "command", "manual"] },
+        "var": { "description": "env: the variable name.", "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+        "key": { "description": "json/ini: the setting name. In json a dot is a path separator.", "type": "string", "minLength": 1 },
+        "section": { "description": "ini: the section name. DEFAULT when absent.", "type": "string", "minLength": 1 },
+        "files": {
+          "description": "The files to read, in order of precedence.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/path" }
+        },
+        "disabled_when": { "$ref": "#/$defs/match_list" },
+        "enabled_when": { "$ref": "#/$defs/match_list" },
+        "disabled_pattern": { "description": "regex/command: a pattern that proves the telemetry is off.", "type": "string", "minLength": 1 },
+        "enabled_pattern": { "description": "regex/command: a pattern that proves the telemetry is on.", "type": "string", "minLength": 1 },
+        "present": { "description": "file: the state to report when the file exists.", "type": "string", "enum": ["disabled", "enabled"] },
+        "argv": {
+          "description": "command: the command to run. Only runs with --allow-commands.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "timeout": { "description": "command: seconds to wait.", "type": "number" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "env" } } },
+          "then": { "required": ["var"], "anyOf": [{ "required": ["disabled_when"] }, { "required": ["enabled_when"] }] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "json" } } },
+          "then": { "required": ["key", "files"], "anyOf": [{ "required": ["disabled_when"] }, { "required": ["enabled_when"] }] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "ini" } } },
+          "then": { "required": ["key", "files"], "anyOf": [{ "required": ["disabled_when"] }, { "required": ["enabled_when"] }] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "regex" } } },
+          "then": { "required": ["files"], "anyOf": [{ "required": ["disabled_pattern"] }, { "required": ["enabled_pattern"] }] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "file" } } },
+          "then": { "required": ["files"] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "command" } } },
+          "then": { "required": ["argv"], "anyOf": [{ "required": ["disabled_pattern"] }, { "required": ["enabled_pattern"] }] }
+        }
+      ]
+    }
+  }
+}

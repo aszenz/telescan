@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import Any, Iterator
 
-DATA_FILE = Path(__file__).with_name("data") / "apps.json"
+from . import schema as app_schema
 
-VALID_PLATFORMS = {"linux", "macos", "windows"}
-VALID_DEFAULTS = {"on", "off", "unknown"}
+DATA_DIR = Path(__file__).with_name("data") / "apps.d"
 
 
 @dataclass
@@ -51,27 +50,56 @@ class Catalog:
 
     @classmethod
     def load(cls, path: Path | None = None) -> "Catalog":
-        raw = json.loads((path or DATA_FILE).read_text(encoding="utf-8"))
-        apps = [App(**entry) for entry in raw["apps"]]
+        """Load the catalog.
+
+        `path` is a directory of one file per application (the default), or
+        a single JSON file holding either one entry or an {"apps": [...]}
+        object.  A user supplied file is read the same way as the shipped
+        catalog, so an entry can be tried out before it is contributed.
+        """
+        source = path or DATA_DIR
+        entries = cls._read(source)
+        contract = app_schema.load_schema()
+        apps: list[App] = []
+        seen: set[str] = set()
+        for origin, entry in entries:
+            problems = app_schema.validate(entry, contract)
+            if problems:
+                raise ValueError(f"{origin} does not match the schema:\n  - "
+                                 + "\n  - ".join(problems))
+            app_id = entry["id"]
+            if app_id in seen:
+                raise ValueError(f"{origin}: duplicate app id: {app_id}")
+            seen.add(app_id)
+            apps.append(App(**{k: v for k, v in entry.items() if k != "$schema"}))
         apps.sort(key=lambda a: (a.category.lower(), a.name.lower()))
-        cls._validate(apps)
         return cls(apps)
 
     @staticmethod
-    def _validate(apps: list[App]) -> None:
-        seen: set[str] = set()
-        for app in apps:
-            if app.id in seen:
-                raise ValueError(f"duplicate app id: {app.id}")
-            seen.add(app.id)
-            if app.default_state not in VALID_DEFAULTS:
-                raise ValueError(f"{app.id}: bad default_state {app.default_state}")
-            bad = set(app.platforms) - VALID_PLATFORMS
-            if bad:
-                raise ValueError(f"{app.id}: bad platforms {sorted(bad)}")
-            for check in app.checks:
-                if "type" not in check:
-                    raise ValueError(f"{app.id}: check without a type")
+    def _read(source: Path) -> list[tuple[str, dict[str, Any]]]:
+        files = sorted(source.glob("*.json")) if source.is_dir() else [source]
+        if source.is_dir() and not files:
+            raise ValueError(f"no catalog entries in {source}")
+        known = {f.name for f in fields(App)}
+        entries: list[tuple[str, dict[str, Any]]] = []
+        for file in files:
+            try:
+                raw = json.loads(file.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as error:
+                raise ValueError(f"{file.name}: {error}") from error
+            found = raw["apps"] if isinstance(raw, dict) and "apps" in raw else [raw]
+            for entry in found:
+                if not isinstance(entry, dict):
+                    raise ValueError(f"{file.name}: an entry is not an object")
+                unknown = sorted(set(entry) - known - {"$schema"})
+                if unknown:
+                    raise ValueError(f"{file.name}: unknown field(s) {unknown}")
+                if source.is_dir() and entry.get("id") != file.stem:
+                    raise ValueError(
+                        f"{file.name}: id {entry.get('id')!r} does not match the file name"
+                    )
+                entries.append((file.name, entry))
+        return entries
 
     def categories(self) -> list[str]:
         return sorted({app.category for app in self.apps})

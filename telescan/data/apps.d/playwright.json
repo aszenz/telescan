@@ -1,0 +1,28 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "playwright",
+  "name": "Playwright",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "No usage telemetry. It does download browser builds from a Microsoft CDN.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "playwright"
+    ],
+    "paths": [
+      "node_modules/@playwright"
+    ]
+  },
+  "checks": [],
+  "disable": {
+    "steps": [
+      "Nothing to turn off."
+    ]
+  },
+  "docs": "https://playwright.dev/"
+}

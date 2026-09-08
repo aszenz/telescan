@@ -1,0 +1,39 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "dotnet",
+  "name": ".NET SDK / CLI",
+  "category": "package-managers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "The dotnet command sends command name, timing, OS and hardware data to Microsoft.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "dotnet"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "DOTNET_CLI_TELEMETRY_OPTOUT",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set DOTNET_CLI_TELEMETRY_OPTOUT=1 in the environment of every shell and build agent."
+    ],
+    "env": {
+      "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
+    }
+  },
+  "docs": "https://learn.microsoft.com/dotnet/core/tools/telemetry"
+}

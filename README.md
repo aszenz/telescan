@@ -40,6 +40,7 @@ telescan scan --export-commands    # the opt-out commands, printed, never run
 telescan list                      # the whole catalog
 telescan show homebrew             # one entry in full
 telescan categories                # the categories and their size
+telescan validate                  # check the catalog against app.schema.json
 ```
 
 Output formats: `--format table` (default), `--format json`, `--format markdown`.
@@ -118,10 +119,13 @@ macOS and Windows. Globs are allowed.
 
 ## Add an application
 
-Add an object to `telescan/data/apps.json`:
+The catalog is one file per application, in `telescan/data/apps.d/`. Add
+`telescan/data/apps.d/myapp.json`, where the file name is the entry `id`. No
+Python change is needed, and one entry per file keeps pull requests apart:
 
 ```json
 {
+  "$schema": "../app.schema.json",
   "id": "myapp",
   "name": "My App",
   "category": "frameworks",
@@ -145,12 +149,18 @@ Add an object to `telescan/data/apps.json`:
 `*truthy*` matches `1`, `true`, `yes`, `on`, `enabled`; `*falsy*` matches `0`,
 `false`, `no`, `off`, `disabled`, `none`. You can also list literal values.
 
-The test suite checks every entry for a description, an opt-out step, a
-documentation link and a detection rule:
+`telescan/data/app.schema.json` is the contract for an entry: the fields, the
+categories, the platforms, and the fields each check type needs. Check your
+entry against it, and point your editor at it for completion:
 
 ```sh
-python3 -m unittest discover -s tests
+telescan validate                      # the whole catalog
+telescan validate path/to/myapp.json   # one file, before you commit it
+python3 -m unittest discover -s tests  # the test suite
 ```
+
+`telescan validate` reads a directory of entries or a single JSON file, so you
+can try an entry out before you contribute it.
 
 ## Limits
 

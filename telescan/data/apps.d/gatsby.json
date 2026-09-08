@@ -1,0 +1,57 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "gatsby",
+  "name": "Gatsby",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends build timings, plugin names and machine data.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "{config}/gatsby/config.json",
+      "node_modules/gatsby"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "GATSBY_TELEMETRY_DISABLED",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "json",
+      "key": "telemetry.enabled",
+      "files": [
+        "{config}/gatsby/config.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: npx gatsby telemetry --disable",
+      "In CI set GATSBY_TELEMETRY_DISABLED=1."
+    ],
+    "commands": [
+      "npx gatsby telemetry --disable"
+    ],
+    "env": {
+      "GATSBY_TELEMETRY_DISABLED": "1"
+    }
+  },
+  "docs": "https://www.gatsbyjs.com/docs/telemetry/"
+}

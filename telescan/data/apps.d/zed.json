@@ -1,0 +1,41 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "zed",
+  "name": "Zed",
+  "category": "editors",
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "what": "Sends metrics (feature usage) and diagnostics (crash reports).",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "zed"
+    ],
+    "paths": [
+      "{config}/zed/settings.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "telemetry.metrics",
+      "files": [
+        "{config}/zed/settings.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Add to ~/.config/zed/settings.json: \"telemetry\": { \"diagnostics\": false, \"metrics\": false }"
+    ]
+  },
+  "docs": "https://zed.dev/docs/telemetry"
+}

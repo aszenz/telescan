@@ -1,0 +1,46 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "github-copilot",
+  "name": "GitHub Copilot",
+  "category": "ai-tools",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Code snippets and suggestion events can be kept by GitHub for product improvement.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "{config}/Code/User/settings.json",
+      "{home}/.config/github-copilot",
+      "{home}/Library/Application Support/Code/User/settings.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "telemetry.telemetryLevel",
+      "files": [
+        "{config}/Code/User/settings.json",
+        "{home}/Library/Application Support/Code/User/settings.json"
+      ],
+      "disabled_when": [
+        "off"
+      ],
+      "enabled_when": [
+        "all",
+        "error",
+        "crash"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Turn off editor telemetry (see the vscode entry).",
+      "In GitHub settings > Copilot, turn off \"Allow GitHub to use my code snippets for product improvements\".",
+      "Organisation owners set the same policy for all members."
+    ]
+  },
+  "docs": "https://docs.github.com/copilot/managing-copilot/managing-copilot-as-an-individual-subscriber/managing-your-copilot-policies"
+}

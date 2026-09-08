@@ -1,0 +1,39 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "syncthing",
+  "name": "Syncthing",
+  "category": "desktop-apps",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Optional anonymous usage reporting to the Syncthing project.",
+  "default_state": "unknown",
+  "detect": {
+    "which": [
+      "syncthing"
+    ],
+    "paths": [
+      "{config}/syncthing/config.xml",
+      "{home}/Library/Application Support/Syncthing/config.xml"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "files": [
+        "{config}/syncthing/config.xml",
+        "{home}/Library/Application Support/Syncthing/config.xml"
+      ],
+      "disabled_pattern": "<urAccepted>-1</urAccepted>",
+      "enabled_pattern": "<urAccepted>[1-9][0-9]*</urAccepted>"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Web UI > Settings: set Anonymous Usage Reporting to No (this writes urAccepted -1)."
+    ]
+  },
+  "docs": "https://docs.syncthing.net/users/config.html"
+}

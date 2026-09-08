@@ -1,0 +1,48 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "terraform",
+  "name": "Terraform",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "The HashiCorp checkpoint service gets a version check with an anonymous machine ID on most commands.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "terraform"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "CHECKPOINT_DISABLE",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "regex",
+      "files": [
+        "{home}/.terraformrc",
+        "{appdata}/terraform.rc"
+      ],
+      "disabled_pattern": "disable_checkpoint\\s*=\\s*true"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Add disable_checkpoint = true to ~/.terraformrc.",
+      "Or set CHECKPOINT_DISABLE=1."
+    ],
+    "env": {
+      "CHECKPOINT_DISABLE": "1"
+    }
+  },
+  "docs": "https://developer.hashicorp.com/terraform/cli/commands#disable_checkpoint"
+}

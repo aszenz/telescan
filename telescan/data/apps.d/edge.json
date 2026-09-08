@@ -1,0 +1,44 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "edge",
+  "name": "Microsoft Edge",
+  "category": "browsers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends browsing and usage diagnostic data to Microsoft.",
+  "default_state": "unknown",
+  "detect": {
+    "paths": [
+      "{config}/microsoft-edge/Local State",
+      "{home}/Library/Application Support/Microsoft Edge/Local State",
+      "{localappdata}/Microsoft/Edge/User Data/Local State"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "user_experience_metrics.reporting_enabled",
+      "files": [
+        "{config}/microsoft-edge/Local State",
+        "{home}/Library/Application Support/Microsoft Edge/Local State",
+        "{localappdata}/Microsoft/Edge/User Data/Local State"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > Privacy, search, and services: turn off the optional diagnostic data and personalization options.",
+      "Fleet wide: set the MetricsReportingEnabled policy to false."
+    ]
+  },
+  "docs": "https://learn.microsoft.com/deployedge/microsoft-edge-policies#metricsreportingenabled"
+}

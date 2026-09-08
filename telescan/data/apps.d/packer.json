@@ -1,0 +1,39 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "packer",
+  "name": "Packer",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Same HashiCorp checkpoint version call as Terraform.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "packer"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "CHECKPOINT_DISABLE",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set CHECKPOINT_DISABLE=1."
+    ],
+    "env": {
+      "CHECKPOINT_DISABLE": "1"
+    }
+  },
+  "docs": "https://developer.hashicorp.com/packer/docs/configure"
+}

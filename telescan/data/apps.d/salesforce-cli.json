@@ -1,0 +1,54 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "salesforce-cli",
+  "name": "Salesforce CLI (sf)",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends command usage and error data to Salesforce.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "sf",
+      "sfdx"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "SF_DISABLE_TELEMETRY",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "env",
+      "var": "SFDX_DISABLE_TELEMETRY",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: sf config set disable-telemetry=true --global",
+      "Or set SF_DISABLE_TELEMETRY=true."
+    ],
+    "commands": [
+      "sf config set disable-telemetry=true --global"
+    ],
+    "env": {
+      "SF_DISABLE_TELEMETRY": "true"
+    }
+  },
+  "docs": "https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_dev_cli_telemetry.htm"
+}

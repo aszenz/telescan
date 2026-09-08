@@ -1,0 +1,71 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "flutter",
+  "name": "Flutter / Dart SDK",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends command usage and crash data to Google.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "flutter",
+      "dart"
+    ],
+    "paths": [
+      "{home}/.dart-tool",
+      "{home}/.flutter"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "FLUTTER_SUPPRESS_ANALYTICS",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "regex",
+      "files": [
+        "{home}/.dart-tool/dart-flutter-telemetry.config"
+      ],
+      "disabled_pattern": "^reporting=0",
+      "enabled_pattern": "^reporting=1"
+    },
+    {
+      "type": "json",
+      "key": "enabled",
+      "files": [
+        "{home}/.flutter"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: flutter --disable-analytics",
+      "Run: dart --disable-analytics",
+      "In CI set FLUTTER_SUPPRESS_ANALYTICS=true."
+    ],
+    "commands": [
+      "flutter --disable-analytics",
+      "dart --disable-analytics"
+    ],
+    "env": {
+      "FLUTTER_SUPPRESS_ANALYTICS": "true"
+    }
+  },
+  "docs": "https://docs.flutter.dev/reference/crash-reporting"
+}

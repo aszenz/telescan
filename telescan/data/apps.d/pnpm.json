@@ -1,0 +1,25 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "pnpm",
+  "name": "pnpm",
+  "category": "package-managers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "No telemetry.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "pnpm"
+    ]
+  },
+  "checks": [],
+  "disable": {
+    "steps": [
+      "Nothing to turn off."
+    ]
+  },
+  "docs": "https://pnpm.io/"
+}

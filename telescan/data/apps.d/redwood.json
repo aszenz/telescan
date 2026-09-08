@@ -1,0 +1,39 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "redwood",
+  "name": "RedwoodJS",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous CLI command and error data.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "node_modules/@redwoodjs"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "REDWOOD_DISABLE_TELEMETRY",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set REDWOOD_DISABLE_TELEMETRY=1, or pass --no-telemetry to the CLI."
+    ],
+    "env": {
+      "REDWOOD_DISABLE_TELEMETRY": "1"
+    }
+  },
+  "docs": "https://redwoodjs.com/docs/telemetry"
+}

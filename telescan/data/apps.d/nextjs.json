@@ -1,0 +1,59 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "nextjs",
+  "name": "Next.js",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Records build and dev commands, feature use, and general machine data for Vercel.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "{config}/nextjs-nodejs/config.json",
+      "{home}/Library/Preferences/nextjs-nodejs/config.json",
+      "node_modules/next"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "NEXT_TELEMETRY_DISABLED",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "json",
+      "key": "telemetry.enabled",
+      "files": [
+        "{config}/nextjs-nodejs/config.json",
+        "{home}/Library/Preferences/nextjs-nodejs/config.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: npx next telemetry disable",
+      "In CI set NEXT_TELEMETRY_DISABLED=1."
+    ],
+    "commands": [
+      "npx next telemetry disable"
+    ],
+    "env": {
+      "NEXT_TELEMETRY_DISABLED": "1"
+    }
+  },
+  "docs": "https://nextjs.org/telemetry"
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "insomnia",
+  "name": "Insomnia",
+  "category": "desktop-apps",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends usage analytics to Kong.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "{config}/Insomnia",
+      "{home}/Library/Application Support/Insomnia"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "enableAnalytics",
+      "files": [
+        "{config}/Insomnia/insomnia.Settings.json",
+        "{home}/Library/Application Support/Insomnia/insomnia.Settings.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Preferences > General: clear \"Send usage statistics\" and \"Send error reports\"."
+    ]
+  },
+  "docs": "https://docs.insomnia.rest/insomnia/application-data"
+}

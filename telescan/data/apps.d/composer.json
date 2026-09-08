@@ -1,0 +1,25 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "composer",
+  "name": "Composer",
+  "category": "package-managers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "No telemetry. Packagist sees the package requests it serves.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "composer"
+    ]
+  },
+  "checks": [],
+  "disable": {
+    "steps": [
+      "Nothing to turn off."
+    ]
+  },
+  "docs": "https://getcomposer.org/"
+}

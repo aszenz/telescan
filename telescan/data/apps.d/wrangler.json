@@ -1,0 +1,60 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "wrangler",
+  "name": "Cloudflare Wrangler",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous command usage to Cloudflare.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "wrangler"
+    ],
+    "paths": [
+      "node_modules/wrangler"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "WRANGLER_SEND_METRICS",
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    },
+    {
+      "type": "json",
+      "key": "permission.enabled",
+      "files": [
+        "{config}/.wrangler/metrics.json",
+        "{home}/Library/Preferences/.wrangler/metrics.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: wrangler telemetry disable",
+      "In CI set WRANGLER_SEND_METRICS=false."
+    ],
+    "commands": [
+      "wrangler telemetry disable"
+    ],
+    "env": {
+      "WRANGLER_SEND_METRICS": "false"
+    }
+  },
+  "docs": "https://developers.cloudflare.com/workers/wrangler/telemetry/"
+}

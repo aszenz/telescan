@@ -1,0 +1,41 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "aws-sam",
+  "name": "AWS SAM CLI",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends command usage and error data to AWS.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "sam"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "SAM_CLI_TELEMETRY",
+      "disabled_when": [
+        "0",
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "1",
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set SAM_CLI_TELEMETRY=0."
+    ],
+    "env": {
+      "SAM_CLI_TELEMETRY": "0"
+    }
+  },
+  "docs": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-telemetry.html"
+}

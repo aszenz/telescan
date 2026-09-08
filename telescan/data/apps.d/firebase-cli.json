@@ -1,0 +1,45 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "firebase-cli",
+  "name": "Firebase CLI",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous CLI usage to Google Analytics.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "firebase"
+    ],
+    "paths": [
+      "{config}/configstore/firebase-tools.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "usage",
+      "files": [
+        "{config}/configstore/firebase-tools.json",
+        "{home}/.config/configstore/firebase-tools.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: firebase logout, then answer No to usage reporting on the next login.",
+      "Or set \"usage\": false in the configstore file.",
+      "Pass --no-analytics per command."
+    ]
+  },
+  "docs": "https://firebase.google.com/support/privacy"
+}

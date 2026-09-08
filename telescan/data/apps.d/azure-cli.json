@@ -1,0 +1,60 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "azure-cli",
+  "name": "Azure CLI",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends command name, parameters used, errors and timing to Microsoft.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "az"
+    ],
+    "paths": [
+      "{home}/.azure"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "AZURE_CORE_COLLECT_TELEMETRY",
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    },
+    {
+      "type": "ini",
+      "section": "core",
+      "key": "collect_telemetry",
+      "files": [
+        "{home}/.azure/config"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: az config set core.collect_telemetry=no",
+      "In CI set AZURE_CORE_COLLECT_TELEMETRY=0."
+    ],
+    "commands": [
+      "az config set core.collect_telemetry=no"
+    ],
+    "env": {
+      "AZURE_CORE_COLLECT_TELEMETRY": "0"
+    }
+  },
+  "docs": "https://learn.microsoft.com/cli/azure/azure-cli-configuration"
+}

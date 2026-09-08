@@ -1,0 +1,32 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "macos-analytics",
+  "name": "macOS analytics (Apple)",
+  "category": "operating-system",
+  "platforms": [
+    "macos"
+  ],
+  "what": "Shares Mac analytics, crash data and Siri data with Apple.",
+  "default_state": "unknown",
+  "detect": {
+    "paths": [
+      "/Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "files": [
+        "/Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist"
+      ],
+      "disabled_pattern": "<key>AutoSubmit</key>\\s*<false/>",
+      "enabled_pattern": "<key>AutoSubmit</key>\\s*<true/>"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "System Settings > Privacy & Security > Analytics & Improvements: turn off every option."
+    ]
+  },
+  "docs": "https://support.apple.com/guide/mac-help/share-analytics-information-mac-apple-mh27990/mac"
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "netdata",
+  "name": "Netdata",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux"
+  ],
+  "what": "Sends anonymous usage statistics from the agent.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "netdata"
+    ],
+    "paths": [
+      "/etc/netdata"
+    ]
+  },
+  "checks": [
+    {
+      "type": "file",
+      "files": [
+        "/etc/netdata/.opt-out-from-anonymous-statistics"
+      ],
+      "present": "disabled"
+    },
+    {
+      "type": "env",
+      "var": "DISABLE_TELEMETRY",
+      "disabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Create the file /etc/netdata/.opt-out-from-anonymous-statistics and restart netdata.",
+      "Or install with the --disable-telemetry flag."
+    ],
+    "commands": [
+      "touch /etc/netdata/.opt-out-from-anonymous-statistics"
+    ],
+    "env": {
+      "DISABLE_TELEMETRY": "1"
+    }
+  },
+  "docs": "https://learn.netdata.cloud/docs/netdata-agent/configuration/anonymous-telemetry-events"
+}

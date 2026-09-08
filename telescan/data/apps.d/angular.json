@@ -1,0 +1,62 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "angular",
+  "name": "Angular CLI",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends command usage and build data to Google Analytics.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "ng"
+    ],
+    "paths": [
+      "{home}/.angular-config.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "NG_CLI_ANALYTICS",
+      "disabled_when": [
+        "false",
+        "ci",
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    },
+    {
+      "type": "json",
+      "key": "cli.analytics",
+      "files": [
+        "{home}/.angular-config.json",
+        "angular.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: ng analytics disable --global",
+      "In CI set NG_CLI_ANALYTICS=false."
+    ],
+    "commands": [
+      "ng analytics disable --global"
+    ],
+    "env": {
+      "NG_CLI_ANALYTICS": "false"
+    }
+  },
+  "docs": "https://angular.dev/cli/analytics"
+}

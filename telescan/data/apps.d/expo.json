@@ -1,0 +1,43 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "expo",
+  "name": "Expo / EAS CLI",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous CLI usage events.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "expo",
+      "eas"
+    ],
+    "paths": [
+      "node_modules/expo"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "EXPO_NO_TELEMETRY",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set EXPO_NO_TELEMETRY=1 in your shell profile and in CI."
+    ],
+    "env": {
+      "EXPO_NO_TELEMETRY": "1"
+    }
+  },
+  "docs": "https://docs.expo.dev/"
+}

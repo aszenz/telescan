@@ -1,0 +1,61 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "turborepo",
+  "name": "Turborepo",
+  "category": "frameworks",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous command and feature usage to Vercel.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "turbo"
+    ],
+    "paths": [
+      "node_modules/turbo",
+      "{config}/turborepo/telemetry.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "TURBO_TELEMETRY_DISABLED",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "json",
+      "key": "telemetry_enabled",
+      "files": [
+        "{config}/turborepo/telemetry.json",
+        "{home}/Library/Application Support/turborepo/telemetry.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: turbo telemetry disable",
+      "In CI set TURBO_TELEMETRY_DISABLED=1."
+    ],
+    "commands": [
+      "turbo telemetry disable"
+    ],
+    "env": {
+      "TURBO_TELEMETRY_DISABLED": "1"
+    }
+  },
+  "docs": "https://turborepo.com/docs/telemetry"
+}

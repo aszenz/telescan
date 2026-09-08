@@ -27,4 +27,4 @@ telescan = "telescan.cli:main"
 packages = ["telescan"]
 
 [tool.setuptools.package-data]
-telescan = ["data/*.json"]
+telescan = ["data/*.json", "data/apps.d/*.json"]

@@ -1,0 +1,28 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "windows-telemetry",
+  "name": "Windows diagnostic data",
+  "category": "operating-system",
+  "platforms": [
+    "windows"
+  ],
+  "what": "Windows sends required and optional diagnostic data to Microsoft.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "C:/Windows/System32"
+    ]
+  },
+  "checks": [
+    {
+      "type": "manual"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > Privacy & security > Diagnostics & feedback: turn off optional diagnostic data and tailored experiences.",
+      "Pro and Enterprise: set the Group Policy Allow Telemetry (AllowTelemetry) to the lowest level your edition supports."
+    ]
+  },
+  "docs": "https://learn.microsoft.com/windows/privacy/configure-windows-diagnostic-data-in-your-organization"
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "brave",
+  "name": "Brave",
+  "category": "browsers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "P3A privacy preserving analytics and crash reports. No Google metrics.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "{config}/BraveSoftware/Brave-Browser/Local State",
+      "{home}/Library/Application Support/BraveSoftware/Brave-Browser/Local State",
+      "{localappdata}/BraveSoftware/Brave-Browser/User Data/Local State"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "brave.p3a.enabled",
+      "files": [
+        "{config}/BraveSoftware/Brave-Browser/Local State",
+        "{home}/Library/Application Support/BraveSoftware/Brave-Browser/Local State",
+        "{localappdata}/BraveSoftware/Brave-Browser/User Data/Local State"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > Privacy and security: turn off product analytics (P3A), diagnostic reports and daily usage ping."
+    ]
+  },
+  "docs": "https://brave.com/privacy/browser/"
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "go",
+  "name": "Go toolchain",
+  "category": "package-managers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Go 1.23+ keeps counter files on disk (mode local). Uploads only happen if you opt in with mode on.",
+  "default_state": "off",
+  "detect": {
+    "which": [
+      "go"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "files": [
+        "{config}/go/telemetry/mode",
+        "{home}/Library/Application Support/go/telemetry/mode"
+      ],
+      "disabled_pattern": "^off",
+      "enabled_pattern": "^on"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: go telemetry off (this also deletes the local counter files)."
+    ],
+    "commands": [
+      "go telemetry off"
+    ]
+  },
+  "docs": "https://go.dev/doc/telemetry"
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "ubuntu-apport",
+  "name": "Ubuntu crash reports (apport / whoopsie)",
+  "category": "operating-system",
+  "platforms": [
+    "linux"
+  ],
+  "what": "apport collects crash data and whoopsie uploads it to Canonical.",
+  "default_state": "on",
+  "detect": {
+    "paths": [
+      "/etc/default/apport"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "files": [
+        "/etc/default/apport"
+      ],
+      "disabled_pattern": "^enabled=0",
+      "enabled_pattern": "^enabled=1"
+    },
+    {
+      "type": "regex",
+      "files": [
+        "/etc/default/whoopsie"
+      ],
+      "disabled_pattern": "report_crashes=false",
+      "enabled_pattern": "report_crashes=true"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set enabled=0 in /etc/default/apport and run: sudo systemctl stop apport",
+      "Set report_crashes=false in /etc/default/whoopsie, or remove the whoopsie package.",
+      "Run: ubuntu-report send no"
+    ],
+    "commands": [
+      "sudo systemctl disable --now apport whoopsie",
+      "ubuntu-report send no"
+    ]
+  },
+  "docs": "https://wiki.ubuntu.com/Apport"
+}

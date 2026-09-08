@@ -1,0 +1,57 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "claude-code",
+  "name": "Claude Code",
+  "category": "ai-tools",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends usage telemetry and error reports to Anthropic.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "claude"
+    ],
+    "paths": [
+      "{home}/.claude"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "DISABLE_TELEMETRY",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "json",
+      "key": "env.DISABLE_TELEMETRY",
+      "files": [
+        "{home}/.claude/settings.json"
+      ],
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set DISABLE_TELEMETRY=1, DISABLE_ERROR_REPORTING=1 and DISABLE_BUG_COMMAND=1.",
+      "Or set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 to cover all of them.",
+      "These can also live in the \"env\" block of ~/.claude/settings.json."
+    ],
+    "env": {
+      "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+    }
+  },
+  "docs": "https://docs.claude.com/en/docs/claude-code/settings"
+}

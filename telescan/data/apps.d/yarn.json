@@ -1,0 +1,39 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "yarn",
+  "name": "Yarn (Berry, v2+)",
+  "category": "package-managers",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous usage counts of the packages you install.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "yarn"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "files": [
+        "{home}/.yarnrc.yml",
+        ".yarnrc.yml"
+      ],
+      "disabled_pattern": "^enableTelemetry:\\s*(false|0)",
+      "enabled_pattern": "^enableTelemetry:\\s*(true|1)"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run in the project: yarn config set --home enableTelemetry 0",
+      "Or add enableTelemetry: false to ~/.yarnrc.yml."
+    ],
+    "commands": [
+      "yarn config set --home enableTelemetry 0"
+    ]
+  },
+  "docs": "https://yarnpkg.com/advanced/telemetry"
+}

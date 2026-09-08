@@ -1,0 +1,60 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "gcloud",
+  "name": "Google Cloud CLI (gcloud)",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends anonymous command usage to Google.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "gcloud"
+    ],
+    "paths": [
+      "{home}/.config/gcloud"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "CLOUDSDK_CORE_DISABLE_USAGE_REPORTING",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "ini",
+      "section": "core",
+      "key": "disable_usage_reporting",
+      "files": [
+        "{home}/.config/gcloud/configurations/config_default"
+      ],
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: gcloud config set disable_usage_reporting true",
+      "In CI set CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true."
+    ],
+    "commands": [
+      "gcloud config set disable_usage_reporting true"
+    ],
+    "env": {
+      "CLOUDSDK_CORE_DISABLE_USAGE_REPORTING": "true"
+    }
+  },
+  "docs": "https://cloud.google.com/sdk/docs/usage-statistics"
+}

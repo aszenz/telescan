@@ -1,0 +1,41 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "winget",
+  "name": "winget",
+  "category": "package-managers",
+  "platforms": [
+    "windows"
+  ],
+  "what": "Sends usage events to Microsoft.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "winget"
+    ],
+    "paths": [
+      "{localappdata}/Packages/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe/LocalState/settings.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "key": "telemetry.disable",
+      "files": [
+        "{localappdata}/Packages/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe/LocalState/settings.json"
+      ],
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: winget settings, then add \"telemetry\": { \"disable\": true }.",
+      "Windows wide diagnostic data settings also apply."
+    ]
+  },
+  "docs": "https://learn.microsoft.com/windows/package-manager/winget/settings"
+}
