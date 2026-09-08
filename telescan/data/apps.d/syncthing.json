@@ -22,17 +22,33 @@
   "checks": [
     {
       "type": "regex",
+      "component": "usage reporting",
       "files": [
         "{config}/syncthing/config.xml",
-        "{home}/Library/Application Support/Syncthing/config.xml"
+        "{data}/syncthing/config.xml",
+        "{home}/Library/Application Support/Syncthing/config.xml",
+        "{localappdata}/Syncthing/config.xml"
       ],
       "disabled_pattern": "<urAccepted>-1</urAccepted>",
       "enabled_pattern": "<urAccepted>[1-9][0-9]*</urAccepted>"
+    },
+    {
+      "type": "regex",
+      "component": "crash reporting",
+      "files": [
+        "{config}/syncthing/config.xml",
+        "{data}/syncthing/config.xml",
+        "{home}/Library/Application Support/Syncthing/config.xml",
+        "{localappdata}/Syncthing/config.xml"
+      ],
+      "disabled_pattern": "<crashReportingEnabled>false</crashReportingEnabled>",
+      "enabled_pattern": "<crashReportingEnabled>true</crashReportingEnabled>"
     }
   ],
   "disable": {
     "steps": [
-      "Web UI > Settings: set Anonymous Usage Reporting to No (this writes urAccepted -1)."
+      "Web UI > Settings: set Anonymous Usage Reporting to No (this writes urAccepted -1).",
+      "Also turn off crash reporting (crashReportingEnabled=false)."
     ]
   },
   "docs": "https://docs.syncthing.net/users/config.html"

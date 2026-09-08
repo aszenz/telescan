@@ -10,7 +10,7 @@ from . import report
 from .catalog import DATA_DIR, Catalog
 from .checks import DISABLED, ENABLED, UNKNOWN
 from .paths import current_platform
-from .scanner import MANUAL, scan, scan_app
+from .scanner import PARTIAL, MANUAL, scan, scan_app
 
 VERSION = "1.0.0"
 
@@ -79,10 +79,10 @@ def _fail_statuses(fail_on: str) -> set[str]:
     if fail_on == "never":
         return set()
     if fail_on == "enabled":
-        return {ENABLED}
+        return {ENABLED, PARTIAL}
     if fail_on == "unknown":
-        return {ENABLED, UNKNOWN}
-    return {ENABLED, UNKNOWN, MANUAL}
+        return {ENABLED, PARTIAL, UNKNOWN}
+    return {ENABLED, PARTIAL, UNKNOWN, MANUAL}
 
 
 def cmd_scan(args: argparse.Namespace, catalog: Catalog) -> int:

@@ -38,6 +38,8 @@ class Finding:
     state: str
     evidence: str
     source: str
+    component: str = "telemetry"
+    profile: str = ""
 
 
 def _normalize(value: Any) -> str:
@@ -52,7 +54,10 @@ def _matches(value: Any, wanted: Iterable[Any]) -> bool:
     got = _normalize(value)
     for item in wanted:
         item_norm = _normalize(item)
-        if item_norm == "*truthy*":
+        if item_norm == "*nonempty*":
+            if str(value) != "":
+                return True
+        elif item_norm == "*truthy*":
             if got in TRUE_WORDS:
                 return True
         elif item_norm == "*falsy*":
@@ -123,8 +128,8 @@ def check_json(check: dict) -> Finding | None:
                 continue
             try:
                 data = read_jsonc(path.read_text(encoding="utf-8", errors="replace"))
-            except (ValueError, OSError):
-                continue
+            except (ValueError, OSError) as error:
+                return Finding(UNKNOWN, f"cannot read JSON: {error}", str(path))
             found, value = json_lookup(data, key)
             if not found:
                 continue
@@ -140,11 +145,11 @@ def check_ini(check: dict) -> Finding | None:
         for path in paths.expand_glob(pattern):
             if not path.is_file():
                 continue
-            parser = configparser.ConfigParser(strict=False, allow_no_value=True)
+            parser = configparser.ConfigParser(strict=False, allow_no_value=True, interpolation=None)
             try:
                 parser.read_string(path.read_text(encoding="utf-8", errors="replace"))
-            except (configparser.Error, OSError):
-                continue
+            except (configparser.Error, OSError) as error:
+                return Finding(UNKNOWN, f"cannot read INI: {error}", str(path))
             if not parser.has_option(section, key):
                 continue
             value = parser.get(section, key)
@@ -161,8 +166,8 @@ def check_regex(check: dict) -> Finding | None:
                 continue
             try:
                 text = path.read_text(encoding="utf-8", errors="replace")
-            except OSError:
-                continue
+            except OSError as error:
+                return Finding(UNKNOWN, f"cannot read file: {error}", str(path))
             if disabled_re:
                 match = re.search(disabled_re, text, re.M)
                 if match:
@@ -198,8 +203,10 @@ def check_command(check: dict, allow_commands: bool) -> Finding | None:
             timeout=check.get("timeout", 15),
             check=False,
         )
-    except (OSError, subprocess.SubprocessError):
-        return None
+    except (OSError, subprocess.SubprocessError) as error:
+        return Finding(UNKNOWN, f"command failed: {error}", " ".join(argv))
+    if proc.returncode != 0:
+        return Finding(UNKNOWN, f"command exited {proc.returncode}", " ".join(argv))
     output = (proc.stdout + proc.stderr).strip()
     disabled_re = check.get("disabled_pattern")
     enabled_re = check.get("enabled_pattern")
@@ -207,7 +214,7 @@ def check_command(check: dict, allow_commands: bool) -> Finding | None:
         return Finding(DISABLED, output.splitlines()[0][:120] if output else "", " ".join(argv))
     if enabled_re and re.search(enabled_re, output, re.I | re.M):
         return Finding(ENABLED, output.splitlines()[0][:120] if output else "", " ".join(argv))
-    return None
+    return Finding(UNKNOWN, "command output did not match a known state", " ".join(argv))
 
 
 def run_check(check: dict, allow_commands: bool = False) -> Finding | None:
@@ -227,3 +234,31 @@ def run_check(check: dict, allow_commands: bool = False) -> Finding | None:
     if kind == "manual":
         return None
     raise ValueError(f"unknown check type: {kind}")
+
+
+def run_checks(check: dict, allow_commands: bool = False) -> list[Finding]:
+    """Read every profile when requested; ordinary file lists retain precedence."""
+    component = check.get("component", "telemetry")
+    if check.get("profiles"):
+        findings = []
+        seen = set()
+        for pattern in check["files"]:
+            for path in paths.expand_glob(pattern):
+                source = str(path)
+                if source in seen:
+                    continue
+                seen.add(source)
+                finding = run_check(dict(check, files=[source]), allow_commands)
+                if finding is None:
+                    default = check.get("default_state", "unknown")
+                    state = {"on": ENABLED, "off": DISABLED}.get(default, UNKNOWN)
+                    finding = Finding(state, f"no setting found; catalog default: {default}", source)
+                finding.component = component
+                finding.profile = source
+                findings.append(finding)
+        return findings
+    finding = run_check(check, allow_commands)
+    if finding is None:
+        return []
+    finding.component = component
+    return [finding]

@@ -21,6 +21,7 @@
   "checks": [
     {
       "type": "env",
+      "component": "usage",
       "var": "DISABLE_TELEMETRY",
       "disabled_when": [
         "*truthy*"
@@ -31,7 +32,83 @@
     },
     {
       "type": "json",
+      "component": "usage",
       "key": "env.DISABLE_TELEMETRY",
+      "files": [
+        "{home}/.claude/settings.json"
+      ],
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "env",
+      "component": "usage",
+      "var": "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "json",
+      "component": "usage",
+      "key": "env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+      "files": [
+        "{home}/.claude/settings.json"
+      ],
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "env",
+      "component": "errors",
+      "var": "DISABLE_ERROR_REPORTING",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "json",
+      "component": "errors",
+      "key": "env.DISABLE_ERROR_REPORTING",
+      "files": [
+        "{home}/.claude/settings.json"
+      ],
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "env",
+      "component": "errors",
+      "var": "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
+    },
+    {
+      "type": "json",
+      "component": "errors",
+      "key": "env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
       "files": [
         "{home}/.claude/settings.json"
       ],
@@ -45,13 +122,13 @@
   ],
   "disable": {
     "steps": [
-      "Set DISABLE_TELEMETRY=1, DISABLE_ERROR_REPORTING=1 and DISABLE_BUG_COMMAND=1.",
-      "Or set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 to cover all of them.",
-      "These can also live in the \"env\" block of ~/.claude/settings.json."
+      "Set DISABLE_TELEMETRY=1 and DISABLE_ERROR_REPORTING=1 to disable usage telemetry and error reporting.",
+      "Alternatively set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1; this also disables automatic updates and the feedback command.",
+      "These variables can also live in the \"env\" block of ~/.claude/settings.json. Restart Claude Code after changing them."
     ],
     "env": {
       "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
     }
   },
-  "docs": "https://docs.claude.com/en/docs/claude-code/settings"
+  "docs": "https://code.claude.com/docs/en/env-vars"
 }

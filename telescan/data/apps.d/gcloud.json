@@ -9,7 +9,7 @@
     "windows"
   ],
   "what": "Sends anonymous command usage to Google.",
-  "default_state": "on",
+  "default_state": "off",
   "detect": {
     "which": [
       "gcloud"

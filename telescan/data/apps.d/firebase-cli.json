@@ -9,7 +9,7 @@
     "windows"
   ],
   "what": "Sends anonymous CLI usage to Google Analytics.",
-  "default_state": "on",
+  "default_state": "off",
   "detect": {
     "which": [
       "firebase"
@@ -36,9 +36,7 @@
   ],
   "disable": {
     "steps": [
-      "Run: firebase logout, then answer No to usage reporting on the next login.",
-      "Or set \"usage\": false in the configstore file.",
-      "Pass --no-analytics per command."
+      "Set \"usage\": false in the Firebase configstore file."
     ]
   },
   "docs": "https://firebase.google.com/support/privacy"

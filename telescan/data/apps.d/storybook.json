@@ -20,6 +20,7 @@
   "checks": [
     {
       "type": "env",
+      "component": "regular telemetry",
       "var": "STORYBOOK_DISABLE_TELEMETRY",
       "disabled_when": [
         "*truthy*"
@@ -30,17 +31,29 @@
     },
     {
       "type": "regex",
+      "component": "regular telemetry",
       "files": [
         ".storybook/main.js",
         ".storybook/main.ts"
       ],
       "disabled_pattern": "disableTelemetry:\\s*true"
+    },
+    {
+      "type": "env",
+      "component": "startup event",
+      "var": "STORYBOOK_DISABLE_TELEMETRY",
+      "disabled_when": [
+        "*truthy*"
+      ],
+      "enabled_when": [
+        "*falsy*"
+      ]
     }
   ],
   "disable": {
     "steps": [
-      "Add core: { disableTelemetry: true } to .storybook/main.js.",
-      "In CI set STORYBOOK_DISABLE_TELEMETRY=1."
+      "Set STORYBOOK_DISABLE_TELEMETRY=1 before Storybook starts to disable all automatic telemetry, including the startup event.",
+      "core: { disableTelemetry: true } disables later telemetry but does not suppress the startup event."
     ],
     "env": {
       "STORYBOOK_DISABLE_TELEMETRY": "1"

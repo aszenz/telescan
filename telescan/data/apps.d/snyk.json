@@ -8,7 +8,7 @@
     "macos",
     "windows"
   ],
-  "what": "Sends anonymous analytics about CLI runs.",
+  "what": "Sends optional CLI analytics that this entry can disable. Snyk documents separate essential operational analytics that cannot be disabled.",
   "default_state": "on",
   "detect": {
     "which": [
@@ -43,7 +43,7 @@
   "disable": {
     "steps": [
       "Run: snyk config set disable-analytics=1",
-      "Or set SNYK_DISABLE_ANALYTICS=1."
+      "Or set SNYK_DISABLE_ANALYTICS=1. These controls do not disable essential operational analytics."
     ],
     "commands": [
       "snyk config set disable-analytics=1"

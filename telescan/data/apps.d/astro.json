@@ -13,7 +13,9 @@
   "detect": {
     "paths": [
       "node_modules/astro",
-      "{config}/astro-nodejs/config.json"
+      "{config}/astro/config.json",
+      "{home}/Library/Preferences/astro/config.json",
+      "{appdata}/astro/Config/config.json"
     ]
   },
   "checks": [
@@ -29,9 +31,11 @@
     },
     {
       "type": "json",
-      "key": "astro.telemetry.enabled",
+      "key": "telemetry.enabled",
       "files": [
-        "{config}/astro-nodejs/config.json"
+        "{config}/astro/config.json",
+        "{home}/Library/Preferences/astro/config.json",
+        "{appdata}/astro/Config/config.json"
       ],
       "disabled_when": [
         "*falsy*"

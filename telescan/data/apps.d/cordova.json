@@ -1,15 +1,15 @@
 {
   "$schema": "../app.schema.json",
   "id": "cordova",
-  "name": "Apache Cordova",
+  "name": "Apache Cordova CLI",
   "category": "frameworks",
   "platforms": [
     "linux",
     "macos",
     "windows"
   ],
-  "what": "Sends anonymous command usage to Google Analytics.",
-  "default_state": "on",
+  "what": "CLI 13 and later has no telemetry. Older releases offered opt-in command-usage telemetry.",
+  "default_state": "off",
   "detect": {
     "which": [
       "cordova"
@@ -32,11 +32,11 @@
   ],
   "disable": {
     "steps": [
-      "Run: cordova telemetry off"
+      "CLI 13 and later: nothing to disable. On CLI 12 and earlier, run: cordova telemetry off."
     ],
     "commands": [
       "cordova telemetry off"
     ]
   },
-  "docs": "https://cordova.apache.org/docs/en/latest/reference/cordova-cli/#cordova-telemetry-command"
+  "docs": "https://cordova.apache.org/announcements/2025/11/25/cordova-cli-13.0.0.html"
 }

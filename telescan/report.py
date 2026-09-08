@@ -8,9 +8,10 @@ import sys
 from typing import TextIO
 
 from .checks import DISABLED, ENABLED, UNKNOWN
-from .scanner import MANUAL, NOT_INSTALLED, Result, summarize
+from .scanner import PARTIAL, MANUAL, NOT_INSTALLED, Result, summarize
 
 LABELS = {
+    PARTIAL: "PARTIAL",
     ENABLED: "ON",
     DISABLED: "OFF",
     UNKNOWN: "UNKNOWN",
@@ -19,6 +20,7 @@ LABELS = {
 }
 
 COLORS = {
+    PARTIAL: "\033[33m",
     ENABLED: "\033[31m",
     DISABLED: "\033[32m",
     UNKNOWN: "\033[33m",
@@ -97,6 +99,7 @@ def render_summary(results: list[Result], painter: Painter) -> str:
     parts = [
         f"{counts[ENABLED]} on",
         f"{counts[DISABLED]} off",
+        f"{counts[PARTIAL]} partial",
         f"{counts[UNKNOWN]} unknown",
         f"{counts[MANUAL]} manual",
     ]
@@ -109,7 +112,7 @@ def render_summary(results: list[Result], painter: Painter) -> str:
 def render_fixes(results: list[Result], painter: Painter) -> str:
     todo = [r for r in results if r.needs_action]
     if not todo:
-        return painter.bold("Nothing to fix. All telemetry is off.\n")
+        return painter.bold("No actionable findings in the scanned catalog entries.\n")
     lines = [painter.bold("How to turn the telemetry off:"), ""]
     for result in todo:
         app = result.app
@@ -168,7 +171,12 @@ def render_json(results: list[Result]) -> str:
                 "what": r.app.what,
                 "docs": r.app.docs,
                 "findings": [
-                    {"state": f.state, "evidence": f.evidence, "source": f.source} for f in r.findings
+                    {"state": f.state, "evidence": f.evidence, "source": f.source,
+                     "component": f.component, "profile": f.profile} for f in r.findings
+                ],
+                "components": [
+                    {"name": c.name, "status": c.status, "reason": c.reason, "profile": c.profile}
+                    for c in r.components
                 ],
                 "disable": {
                     "steps": r.app.steps,
@@ -188,7 +196,7 @@ def render_markdown(results: list[Result]) -> str:
         "# Telemetry report",
         "",
         f"{counts['total']} applications scanned: {counts[ENABLED]} on, {counts[DISABLED]} off, "
-        f"{counts[UNKNOWN]} unknown, {counts[MANUAL]} manual.",
+        f"{counts[PARTIAL]} partial, {counts[UNKNOWN]} unknown, {counts[MANUAL]} manual.",
         "",
         "| Status | Application | Category | Detail | Docs |",
         "| --- | --- | --- | --- | --- |",

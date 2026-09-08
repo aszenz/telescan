@@ -21,6 +21,16 @@
   },
   "checks": [
     {
+      "type": "env",
+      "var": "GF_ANALYTICS_REPORTING_ENABLED",
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ]
+    },
+    {
       "type": "ini",
       "section": "analytics",
       "key": "reporting_enabled",

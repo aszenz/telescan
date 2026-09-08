@@ -21,8 +21,12 @@
   "checks": [
     {
       "type": "json",
-      "key": "usageStatisticsEnabled",
+      "key": "privacy.usageStatisticsEnabled",
       "files": [
+        "/etc/gemini-cli/settings.json",
+        "{programdata}/gemini-cli/settings.json",
+        "{home}/Library/Application Support/GeminiCli/settings.json",
+        ".gemini/settings.json",
         "{home}/.gemini/settings.json"
       ],
       "disabled_when": [
@@ -35,8 +39,8 @@
   ],
   "disable": {
     "steps": [
-      "Set \"usageStatisticsEnabled\": false in ~/.gemini/settings.json."
+      "Set \"privacy\": { \"usageStatisticsEnabled\": false } in ~/.gemini/settings.json, then restart Gemini CLI."
     ]
   },
-  "docs": "https://google-gemini.github.io/gemini-cli/docs/telemetry.html"
+  "docs": "https://geminicli.com/docs/reference/configuration/"
 }

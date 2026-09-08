@@ -28,7 +28,7 @@
   ],
   "disable": {
     "steps": [
-      "Run: go telemetry off (this also deletes the local counter files)."
+      "Run: go telemetry off."
     ],
     "commands": [
       "go telemetry off"

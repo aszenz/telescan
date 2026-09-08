@@ -8,8 +8,8 @@
     "macos",
     "windows"
   ],
-  "what": "VS Code fork. Sends editor telemetry, plus prompt and code data unless Privacy Mode is on.",
-  "default_state": "on",
+  "what": "Cursor processes prompts and code for AI features. Privacy Mode restricts storage and training, but does not keep prompts and code on the machine.",
+  "default_state": "unknown",
   "detect": {
     "which": [
       "cursor"
@@ -21,26 +21,13 @@
   },
   "checks": [
     {
-      "type": "json",
-      "key": "telemetry.telemetryLevel",
-      "files": [
-        "{config}/Cursor/User/settings.json",
-        "{home}/Library/Application Support/Cursor/User/settings.json"
-      ],
-      "disabled_when": [
-        "off"
-      ],
-      "enabled_when": [
-        "all",
-        "error",
-        "crash"
-      ]
+      "type": "manual"
     }
   ],
   "disable": {
     "steps": [
-      "Set \"telemetry.telemetryLevel\": \"off\" in settings.json.",
-      "Turn on Privacy Mode in Cursor Settings > General to stop code and prompts leaving the machine."
+      "Review Cursor Settings > General > Privacy Mode and your account or organization privacy controls.",
+      "Privacy Mode restricts storage and training; AI requests still send the context needed to provide the feature."
     ]
   },
   "docs": "https://cursor.com/security"

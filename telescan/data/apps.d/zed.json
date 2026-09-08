@@ -7,7 +7,7 @@
     "linux",
     "macos"
   ],
-  "what": "Sends metrics (feature usage) and diagnostics (crash reports).",
+  "what": "Client-side usage metrics and diagnostics (crash reports). Hosted-service and training-data policies are outside these local checks.",
   "default_state": "on",
   "detect": {
     "which": [
@@ -29,7 +29,22 @@
       ],
       "enabled_when": [
         "*truthy*"
-      ]
+      ],
+      "component": "metrics"
+    },
+    {
+      "type": "json",
+      "key": "telemetry.diagnostics",
+      "files": [
+        "{config}/zed/settings.json"
+      ],
+      "disabled_when": [
+        "*falsy*"
+      ],
+      "enabled_when": [
+        "*truthy*"
+      ],
+      "component": "diagnostics"
     }
   ],
   "disable": {

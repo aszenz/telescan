@@ -20,10 +20,7 @@
       "type": "env",
       "var": "VAGRANT_CHECKPOINT_DISABLE",
       "disabled_when": [
-        "*truthy*"
-      ],
-      "enabled_when": [
-        "*falsy*"
+        "*nonempty*"
       ]
     }
   ],

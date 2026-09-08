@@ -125,6 +125,9 @@
       "required": ["type"],
       "properties": {
         "type": { "type": "string", "enum": ["env", "json", "ini", "regex", "file", "command", "manual"] },
+        "component": { "description": "Independent control; every component must be off for the app to be OFF.", "type": "string", "minLength": 1 },
+        "profiles": { "description": "Read every matching file as a separate profile instead of using file precedence.", "type": "boolean" },
+        "default_state": { "description": "Fallback for this component or profile when its setting is absent.", "type": "string", "enum": ["on", "off", "unknown"] },
         "var": { "description": "env: the variable name.", "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
         "key": { "description": "json/ini: the setting name. In json a dot is a path separator.", "type": "string", "minLength": 1 },
         "section": { "description": "ini: the section name. DEFAULT when absent.", "type": "string", "minLength": 1 },
@@ -148,6 +151,10 @@
         "timeout": { "description": "command: seconds to wait.", "type": "number" }
       },
       "allOf": [
+        {
+          "if": { "required": ["profiles"], "properties": { "profiles": { "const": true } } },
+          "then": { "required": ["files"], "properties": { "type": { "enum": ["json", "ini", "regex"] } } }
+        },
         {
           "if": { "properties": { "type": { "const": "env" } } },
           "then": { "required": ["var"], "anyOf": [{ "required": ["disabled_when"] }, { "required": ["enabled_when"] }] }

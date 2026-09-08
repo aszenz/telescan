@@ -20,16 +20,13 @@
       "type": "env",
       "var": "REDWOOD_DISABLE_TELEMETRY",
       "disabled_when": [
-        "*truthy*"
-      ],
-      "enabled_when": [
-        "*falsy*"
+        "*nonempty*"
       ]
     }
   ],
   "disable": {
     "steps": [
-      "Set REDWOOD_DISABLE_TELEMETRY=1, or pass --no-telemetry to the CLI."
+      "Set REDWOOD_DISABLE_TELEMETRY=1."
     ],
     "env": {
       "REDWOOD_DISABLE_TELEMETRY": "1"

@@ -5,7 +5,7 @@ send telemetry, and how to turn each one off.
 
 It is two things in one:
 
-1. **A catalog.** 71 common developer and desktop applications, with what each
+1. **A catalog.** 70 common developer and desktop applications, with what each
    one collects, the default state, the exact switch, and a link to the vendor
    documentation.
 2. **A scanner.** It reads the config files and environment variables on your
@@ -65,13 +65,25 @@ OFF  Go toolchain                  package-managers
 | Status | Meaning |
 | --- | --- |
 | `ON` | Telemetry is on, or the application is on by default and no opt-out was found. |
-| `OFF` | An opt-out was found, or the application sends nothing by default. |
+| `OFF` | All checked components and discovered profiles are disabled, or the catalog assumes they are off by default. |
+| `PARTIAL` | Some components or profiles are disabled; others are enabled, unknown, or manual. |
 | `UNKNOWN` | The application is installed but the state could not be read. |
 | `MANUAL` | There is no local switch to read. The entry says what to do instead. |
 | `ABSENT` | Not installed. Only shown with `--all`. |
 
-An opt-out always wins: if any check reports "off", the application is `OFF`,
-because environment variables normally override the config file.
+Independent components and profiles are evaluated separately. For example,
+Claude Code usage telemetry being off does not establish that error reporting
+is off, and one Firefox profile cannot establish the state of another.
+
+Within a component/profile, the existing opt-out-wins rule is retained for
+recognized settings. Unreadable configuration and unrecognized values produce
+`UNKNOWN` instead of falling back to catalog defaults. Application-specific
+precedence between conflicting settings is not yet modeled.
+
+`OFF` describes the checks in the catalog, not all possible data collection.
+For example, Firefox currently checks health-report uploads; other browser
+controls and enterprise policies still need separate review. Copilot account
+policies are `MANUAL`, even when VS Code telemetry is disabled.
 
 ## Catalog
 
@@ -79,7 +91,7 @@ because environment variables normally override the config file.
 | --- | --- | --- |
 | `ai-tools` | 3 | Claude Code, Gemini CLI, GitHub Copilot |
 | `browsers` | 5 | Firefox, Chrome, Brave, Edge, Chromium |
-| `cloud-cli` | 21 | Terraform, gcloud, Azure CLI, Docker, Vercel, Wrangler, Snyk |
+| `cloud-cli` | 20 | Terraform, gcloud, Azure CLI, Docker, Vercel, Wrangler, Snyk |
 | `desktop-apps` | 4 | Slack, Zoom, Insomnia, Syncthing |
 | `editors` | 7 | VS Code, Cursor, JetBrains IDEs, Zed, Android Studio |
 | `frameworks` | 17 | Next.js, Nuxt, Astro, Angular, Storybook, Flutter, Cypress |
@@ -91,7 +103,8 @@ Run `telescan list` for the full list.
 ## Use it in CI
 
 `telescan` exits `1` when something matched `--fail-on` (default: `enabled`),
-`0` when there is nothing to act on, and `2` on a usage or catalog error.
+`0` when no result matches the threshold, and `2` on a usage or catalog error.
+`PARTIAL` also fails the default `--fail-on enabled` threshold.
 
 ```sh
 # fail the build if a developer image ships with telemetry on
@@ -112,6 +125,25 @@ one place only:
 | `file` | A marker file that only exists when telemetry is off. |
 | `command` | The output of the application itself. Runs only with `--run-commands`. |
 | `manual` | Nothing. It marks an application with no local switch. |
+
+Checks can optionally declare:
+
+- `component`: a name such as `metrics` or `diagnostics`. Each component must
+  be disabled before the application can be `OFF`.
+- `profiles: true`: for JSON, INI, or regex checks, evaluate every matching
+  file independently. Without it, the file list retains its precedence order.
+- `default_state`: `on`, `off`, or `unknown` for that component. Profile checks
+  should set it explicitly; missing preferences in discovered profiles use
+  this default (otherwise `unknown`). Read errors never use the default.
+
+Components appear in table and Markdown details and in the JSON `components`
+array. JSON findings include `component` and `profile` fields; the latter is
+empty for checks that do not operate on separate profiles. Profile paths refer
+to all discovered matching files, which may include inactive profiles.
+
+The regression suite checks that every environment opt-out advertised in
+`disable.env` is recognized using an isolated environment and no config files.
+Command and prose-only instructions still need application-specific fixtures.
 
 Paths in the catalog use placeholders (`{home}`, `{config}`, `{data}`,
 `{appsupport}`, `{appdata}`, `{localappdata}`), so one entry works on Linux,
@@ -147,7 +179,9 @@ Python change is needed, and one entry per file keeps pull requests apart:
 ```
 
 `*truthy*` matches `1`, `true`, `yes`, `on`, `enabled`; `*falsy*` matches `0`,
-`false`, `no`, `off`, `disabled`, `none`. You can also list literal values.
+`false`, `no`, `off`, `disabled`, `none`; and `*nonempty*` matches every
+nonempty value. Use `*nonempty*` only for controls whose upstream implementation
+tests presence rather than parsing a boolean. You can also list literal values.
 
 `telescan/data/app.schema.json` is the contract for an entry: the fields, the
 categories, the platforms, and the fields each check type needs. Check your

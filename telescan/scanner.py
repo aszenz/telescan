@@ -10,7 +10,16 @@ from .catalog import App, Catalog
 
 NOT_INSTALLED = "not_installed"
 MANUAL = "manual"
-STATUS_ORDER = [checks.ENABLED, checks.UNKNOWN, MANUAL, checks.DISABLED, NOT_INSTALLED]
+PARTIAL = "partial"
+STATUS_ORDER = [checks.ENABLED, PARTIAL, checks.UNKNOWN, MANUAL, checks.DISABLED, NOT_INSTALLED]
+
+
+@dataclass
+class ComponentResult:
+    name: str
+    status: str
+    reason: str
+    profile: str = ""
 
 
 @dataclass
@@ -21,9 +30,11 @@ class Result:
     reason: str
     findings: list[checks.Finding] = field(default_factory=list)
 
+    components: list[ComponentResult] = field(default_factory=list)
+
     @property
     def needs_action(self) -> bool:
-        return self.status in (checks.ENABLED, checks.UNKNOWN, MANUAL)
+        return self.status in (checks.ENABLED, PARTIAL, checks.UNKNOWN, MANUAL)
 
 
 def detect(app: App) -> tuple[bool, str]:
@@ -46,26 +57,55 @@ def scan_app(app: App, allow_commands: bool = False, assume_installed: bool = Fa
         return Result(app, False, NOT_INSTALLED, why)
 
     findings: list[checks.Finding] = []
+    groups: dict[str, list[dict]] = {}
     for check in app.checks:
-        finding = checks.run_check(check, allow_commands=allow_commands)
-        if finding is not None and finding.state != checks.UNKNOWN:
-            findings.append(finding)
+        groups.setdefault(check.get("component", "telemetry"), []).append(check)
+        findings.extend(checks.run_checks(check, allow_commands=allow_commands))
 
-    for finding in findings:
-        if finding.state == checks.DISABLED:
-            return Result(app, installed, checks.DISABLED, finding.evidence, findings)
-    for finding in findings:
-        if finding.state == checks.ENABLED:
-            return Result(app, installed, checks.ENABLED, finding.evidence, findings)
+    components = []
+    for name, rules in (groups or {"telemetry": []}).items():
+        relevant = [f for f in findings if f.component == name]
+        profiles = list(dict.fromkeys(f.profile for f in relevant if f.profile))
+        for profile in profiles or [""]:
+            selected = [f for f in relevant if not f.profile or f.profile == profile]
+            default = next((r["default_state"] for r in rules if "default_state" in r), app.default_state)
+            status, reason = _resolve(selected, default, bool(rules) and all(r["type"] == "manual" for r in rules))
+            components.append(ComponentResult(name, status, reason, profile))
 
-    only_manual = bool(app.checks) and all(c["type"] == "manual" for c in app.checks)
-    if only_manual:
-        return Result(app, installed, MANUAL, "no local switch to read; check by hand", findings)
-    if app.default_state == "on":
-        return Result(app, installed, checks.ENABLED, "no opt-out found; telemetry is on by default", findings)
-    if app.default_state == "off":
-        return Result(app, installed, checks.DISABLED, "telemetry is off by default", findings)
-    return Result(app, installed, checks.UNKNOWN, "no setting found", findings)
+    states = {c.status for c in components}
+    if len(states) == 1:
+        status = components[0].status
+    elif checks.DISABLED in states:
+        status = PARTIAL
+    elif checks.ENABLED in states:
+        status = checks.ENABLED
+    else:
+        status = checks.UNKNOWN
+    reason = components[0].reason if len(components) == 1 else "; ".join(
+        f"{c.name}" + (f" [{c.profile}]" if c.profile else "") + f": {c.status} ({c.reason})"
+        for c in components
+    )
+    return Result(app, installed, status, reason, findings, components)
+
+
+def _resolve(findings: list[checks.Finding], default: str, manual: bool) -> tuple[str, str]:
+    # Preserve legacy opt-out semantics within one component only. Independent
+    # components and profiles must never cancel each other's enabled findings.
+    # Read errors and unrecognized values cannot establish an opt-out.
+    for finding in findings:
+        if finding.state == checks.UNKNOWN:
+            return checks.UNKNOWN, finding.evidence
+    for state in (checks.DISABLED, checks.ENABLED):
+        for finding in findings:
+            if finding.state == state:
+                return state, finding.evidence
+    if manual:
+        return MANUAL, "no local switch to read; check by hand"
+    if default == "on":
+        return checks.ENABLED, "no opt-out found; assumed on from catalog default"
+    if default == "off":
+        return checks.DISABLED, "assumed off from catalog default"
+    return checks.UNKNOWN, "no setting found"
 
 
 def scan(

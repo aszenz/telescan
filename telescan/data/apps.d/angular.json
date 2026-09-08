@@ -9,7 +9,7 @@
     "windows"
   ],
   "what": "Sends command usage and build data to Google Analytics.",
-  "default_state": "on",
+  "default_state": "off",
   "detect": {
     "which": [
       "ng"

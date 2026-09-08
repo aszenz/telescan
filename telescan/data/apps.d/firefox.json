@@ -8,7 +8,7 @@
     "macos",
     "windows"
   ],
-  "what": "Sends technical and interaction data (Telemetry), plus crash reports and Firefox Suggest data.",
+  "what": "Checks the health-report upload preference in every discovered profile. Crash reporting, Firefox Suggest, and enterprise policy enforcement are not yet checked.",
   "default_state": "on",
   "detect": {
     "which": [
@@ -29,7 +29,10 @@
         "{appdata}/Mozilla/Firefox/Profiles/*/prefs.js"
       ],
       "disabled_pattern": "user_pref\\(\"datareporting\\.healthreport\\.uploadEnabled\",\\s*false\\)",
-      "enabled_pattern": "user_pref\\(\"datareporting\\.healthreport\\.uploadEnabled\",\\s*true\\)"
+      "enabled_pattern": "user_pref\\(\"datareporting\\.healthreport\\.uploadEnabled\",\\s*true\\)",
+      "component": "usage",
+      "profiles": true,
+      "default_state": "on"
     }
   ],
   "disable": {

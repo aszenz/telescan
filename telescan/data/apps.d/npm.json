@@ -8,7 +8,7 @@
     "macos",
     "windows"
   ],
-  "what": "No usage telemetry. The registry still sees your install requests, and the update notifier calls out on its own.",
+  "what": "No usage telemetry. The registry still sees install and audit requests, and the update notifier makes a separate version check.",
   "default_state": "off",
   "detect": {
     "which": [
@@ -18,23 +18,26 @@
   "checks": [
     {
       "type": "env",
-      "var": "NO_UPDATE_NOTIFIER",
+      "var": "npm_config_update_notifier",
       "disabled_when": [
-        "*truthy*"
+        "false"
+      ],
+      "enabled_when": [
+        "true"
       ]
     }
   ],
   "disable": {
     "steps": [
       "Nothing to opt out of.",
-      "To mute the update check: export NO_UPDATE_NOTIFIER=1, or npm config set update-notifier false.",
-      "Use --no-audit and --no-fund to stop the extra registry calls on install."
+      "To disable the update check, run: npm config set update-notifier false.",
+      "Use --no-audit to skip audit requests. --no-fund only hides funding output."
     ],
     "commands": [
       "npm config set update-notifier false"
     ],
     "env": {
-      "NO_UPDATE_NOTIFIER": "1"
+      "npm_config_update_notifier": "false"
     }
   },
   "docs": "https://docs.npmjs.com/cli/v10/using-npm/config#update-notifier"

@@ -8,18 +8,37 @@
     "macos",
     "windows"
   ],
-  "what": "No telemetry. Packagist sees the package requests it serves.",
-  "default_state": "off",
+  "what": "No usage analytics. By default Composer may notify third-party repositories when one of their packages is installed.",
+  "default_state": "on",
   "detect": {
     "which": [
       "composer"
     ]
   },
-  "checks": [],
+  "checks": [
+    {
+      "type": "json",
+      "key": "config.notify-on-install",
+      "files": [
+        "composer.json",
+        "{config}/composer/config.json",
+        "{appdata}/Composer/config.json"
+      ],
+      "disabled_when": [
+        false
+      ],
+      "enabled_when": [
+        true
+      ]
+    }
+  ],
   "disable": {
     "steps": [
-      "Nothing to turn off."
+      "Run: composer config --global notify-on-install false."
+    ],
+    "commands": [
+      "composer config --global notify-on-install false"
     ]
   },
-  "docs": "https://getcomposer.org/"
+  "docs": "https://getcomposer.org/doc/06-config.md#notify-on-install"
 }

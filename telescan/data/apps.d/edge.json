@@ -19,26 +19,14 @@
   },
   "checks": [
     {
-      "type": "json",
-      "key": "user_experience_metrics.reporting_enabled",
-      "files": [
-        "{config}/microsoft-edge/Local State",
-        "{home}/Library/Application Support/Microsoft Edge/Local State",
-        "{localappdata}/Microsoft/Edge/User Data/Local State"
-      ],
-      "disabled_when": [
-        "*falsy*"
-      ],
-      "enabled_when": [
-        "*truthy*"
-      ]
+      "type": "manual"
     }
   ],
   "disable": {
     "steps": [
       "Settings > Privacy, search, and services: turn off the optional diagnostic data and personalization options.",
-      "Fleet wide: set the MetricsReportingEnabled policy to false."
+      "On supported managed Windows and macOS installations, set the DiagnosticData policy to 0 and restart Edge."
     ]
   },
-  "docs": "https://learn.microsoft.com/deployedge/microsoft-edge-policies#metricsreportingenabled"
+  "docs": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies#diagnosticdata"
 }

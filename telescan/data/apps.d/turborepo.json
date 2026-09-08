@@ -24,10 +24,12 @@
       "type": "env",
       "var": "TURBO_TELEMETRY_DISABLED",
       "disabled_when": [
-        "*truthy*"
+        "1",
+        "true"
       ],
       "enabled_when": [
-        "*falsy*"
+        "0",
+        "false"
       ]
     },
     {
