@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/telescan-logo-readme.png" alt="telescan" width="320">
+</p>
+
 # Telemetry flag audit — 2026-09-08
 
 All 71 catalog entries were searched individually. This audit favors vendor documentation and upstream source. “Confirmed” means the named control is supported, **not** that every accepted value, storage path, version, precedence rule, plugin, or running process has been verified. “Qualified” means the control has narrower scope or unresolved implementation details. “Mismatch” identifies a concrete conflict with the existing catalog. “Unresolved” means the research did not establish the claim; it does not mean telemetry is enabled.

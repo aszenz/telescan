@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/telescan-logo-readme.png" alt="telescan" width="320">
+</p>
+
 # TODOs
 
 ## Public preview blockers

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aszenz/telescan/main/docs/assets/telescan-logo-readme.png" alt="telescan" width="480">
+</p>
+
 # telescan
 
 A command line scanner that tells you which applications on your machine still
