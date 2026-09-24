@@ -95,6 +95,8 @@ def render_table(results: list[Result], painter: Painter, verbose: bool = False)
             # One setting can serve several components; show it once.
             for source, evidence in dict.fromkeys((f.source, f.evidence) for f in result.findings):
                 lines.append(f"{' ' * (status_w + 2)}{painter.dim('· ' + source + ': ' + evidence)}")
+            for url in result.app.evidence:
+                lines.append(f"{' ' * (status_w + 2)}{painter.dim('· evidence: ' + url)}")
     return "\n".join(lines) + "\n"
 
 
@@ -117,18 +119,20 @@ def render_summary(results: list[Result], painter: Painter) -> str:
     ]
     if counts[NOT_INSTALLED]:
         parts.append(f"{counts[NOT_INSTALLED]} absent")
-    head = painter.bold(f"{counts['total']} applications scanned: ")
+    noun = "app" if counts["total"] == 1 else "apps"
+    head = painter.bold(f"{counts['total']} {noun} scanned: ")
     return head + ", ".join(parts) + "\n"
 
 
-def render_fixes(results: list[Result], painter: Painter) -> str:
-    todo = [r for r in results if r.needs_action]
+def render_fixes(results: list[Result], painter: Painter, include_absent: bool = False) -> str:
+    todo = [r for r in results if r.needs_action or (include_absent and not r.installed)]
     if not todo:
         return painter.bold("No actionable findings in the scanned catalog entries.\n")
     lines = [painter.bold("How to turn the telemetry off:"), ""]
     for result in todo:
         app = result.app
-        lines.append(f"{painter.status(result.status)} {painter.bold(app.name)}  ({app.id})")
+        name = app.name if f"({app.id})" in app.name else f"{app.name}  ({app.id})"
+        lines.append(f"{painter.status(result.status)} {painter.bold(name)}")
         lines.append(f"    {app.what}")
         for step in app.steps:
             lines.append(f"    - {step}")
@@ -238,35 +242,6 @@ def render_markdown(results: list[Result]) -> str:
         )
     lines.append("")
     return "\n".join(lines) + "\n"
-
-
-def render_app_details(app: App, painter: Painter) -> str:
-    lines = [
-        painter.bold(f"{app.name}  ({app.id})"),
-        f"  category   {app.category}",
-        f"  platforms  {', '.join(app.platforms)}",
-        f"  default    telemetry is {app.default_state} out of the box",
-        f"  what       {app.what}",
-        f"  scope      {', '.join(app.scope)}",
-        f"  verified   {app.verification} ({app.verified_at or 'never'})",
-    ]
-    if app.version_note:
-        lines.append(f"  versions   {app.version_note}")
-    lines += [
-        "",
-        painter.bold("  How to turn it off:"),
-    ]
-    for step in app.steps:
-        lines.append(f"    - {step}")
-    if app.env:
-        for key, value in app.env.items():
-            lines.append(f"    - export {key}={value}")
-    if app.docs:
-        lines += ["", f"  docs       {app.docs}"]
-    for url in app.evidence:
-        lines.append(f"  evidence   {url}")
-    lines.append("")
-    return "\n".join(lines)
 
 
 def write(text: str, stream: TextIO | None = None) -> None:

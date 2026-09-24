@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import sys
@@ -355,24 +356,40 @@ class TestCli(unittest.TestCase):
             sys.stdout = stdout
         return code, buffer.getvalue()
 
-    def test_list(self) -> None:
-        code, out = self.run_cli(["list", "--no-color"])
+    def test_all_lists_the_catalog(self) -> None:
+        code, out = self.run_cli(["--all", "--no-color", "--fail-on", "never"])
         self.assertEqual(code, 0)
-        self.assertIn("vscode", out)
+        self.assertIn("Visual Studio Code", out)
+
+    def test_app_names_need_the_scan_command(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.run_cli(["vscode"])
 
     def test_scan_json_is_valid(self) -> None:
-        code, out = self.run_cli(["scan", "--format", "json", "--all"])
+        code, out = self.run_cli(["--format", "json", "--all"])
         payload = json.loads(out)
         self.assertIn("summary", payload)
         self.assertIn(code, (0, 1))
 
-    def test_show_unknown_app(self) -> None:
-        code, out = self.run_cli(["show", "no-such-app"])
+    def test_unknown_app(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+            code, _ = self.run_cli(["scan", "no-such-app"])
         self.assertEqual(code, 2)
-        self.assertIn("No catalog entry", out)
+        self.assertIn("no app named", err.getvalue())
+
+    def test_unknown_category(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+            code, _ = self.run_cli(["--category", "nope"])
+        self.assertEqual(code, 2)
+        self.assertIn("browsers", err.getvalue())
+
+    def test_named_app_shows_how_to_turn_it_off(self) -> None:
+        _, out = self.run_cli(["scan", "homebrew", "--no-color", "--fail-on", "never"])
+        self.assertIn("HOMEBREW_NO_ANALYTICS", out)
+        self.assertIn("evidence:", out)
 
     def test_fail_on_never_exits_zero(self) -> None:
-        code, _ = self.run_cli(["scan", "--fail-on", "never"])
+        code, _ = self.run_cli(["--fail-on", "never"])
         self.assertEqual(code, 0)
 
     def test_default_command_is_scan(self) -> None:
@@ -381,7 +398,7 @@ class TestCli(unittest.TestCase):
         self.assertIn("summary", out)
 
     def test_markdown_table(self) -> None:
-        _, out = self.run_cli(["scan", "--format", "markdown", "--all"])
+        _, out = self.run_cli(["--format", "markdown", "--all"])
         self.assertIn("| Status | Application |", out)
 
     def test_validate(self) -> None:
@@ -392,11 +409,6 @@ class TestCli(unittest.TestCase):
     def test_validate_reports_a_bad_entry(self) -> None:
         path = write_entries([valid_entry(docs="http://example.com")])
         self.assertEqual(main(["validate", str(path)]), 2)
-
-    def test_categories(self) -> None:
-        code, out = self.run_cli(["categories"])
-        self.assertEqual(code, 0)
-        self.assertIn("browsers", out)
 
 
 class TestReport(unittest.TestCase):

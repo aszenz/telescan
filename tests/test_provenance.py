@@ -259,7 +259,7 @@ class TestProvenanceOutput(unittest.TestCase):
         self.assertIn("qualified", out)
         self.assertIn("audited", out)
 
-    def test_show_has_provenance(self) -> None:
-        _, out = self.run_cli(["show", "aws-cdk", "--no-color"])
-        for text in ("scope", "verified", "versions", "CLI telemetry >=2.1100.0", "evidence"):
+    def test_named_app_has_provenance(self) -> None:
+        _, out = self.run_cli(["scan", "aws-cdk", "--no-color"])
+        for text in ("scope", "audited", "versions", "CLI telemetry >=2.1100.0", "evidence"):
             self.assertIn(text, out)

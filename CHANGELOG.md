@@ -13,3 +13,6 @@ All notable changes are recorded here. The format follows
 - Entries with no documented opt-out are `MANUAL`, not "no telemetry".
 - npm: the update notifier is on by default, and `~/.npmrc` is now read.
 - `-v` lists a setting once, even when several components use it.
+- `telescan scan <app>` shows the sources and how to turn each app off;
+  `-v` does this for every app. `list`, `show`, `categories` and `--fix`
+  are removed.

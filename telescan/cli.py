@@ -11,22 +11,19 @@ from . import report
 from .catalog import DATA_DIR, Catalog
 from .checks import ENABLED, UNKNOWN
 from .paths import current_platform
-from .scanner import MANUAL, PARTIAL, scan, scan_app
+from .scanner import MANUAL, PARTIAL, scan
 
 EPILOG = """\
 examples:
-  telescan scan                     scan this machine
-  telescan scan --fix               scan, then print how to turn each one off
-  telescan scan --all               include applications that are not installed
-  telescan scan --format json       machine readable output for CI
-  telescan scan --export-env        print the export lines for your shell profile
-  telescan list --category browsers list the catalog entries of one category
-  telescan show homebrew            show one entry in full
-  telescan validate                 check the catalog against app.schema.json
+  telescan                      scan this machine
+  telescan scan vscode npm      scan some apps, with sources and how to turn each off
+  telescan scan -v              show sources and how to turn off every hit
+  telescan scan --format json   machine readable output, for CI
+  telescan scan --export-env    print export lines for your shell profile
 
 exit codes:
   0  nothing to act on
-  1  at least one application matched --fail-on (default: enabled)
+  1  at least one app matched --fail-on (default: enabled)
   2  usage or catalog error
 """
 
@@ -34,37 +31,31 @@ exit codes:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="telescan",
-        description="Scan the applications on this machine and report which ones still send telemetry.",
+        description="Report which apps on this machine still send telemetry.",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="version", version=f"telescan {VERSION}")
-    sub = parser.add_subparsers(dest="command")
+    # A subparser without help= is not listed: "validate" is for contributors.
+    sub = parser.add_subparsers(dest="command", metavar="{scan}")
 
-    common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--category", help="limit to one category")
-    common.add_argument("--platform", help="linux, macos or windows (default: this machine)")
-    common.add_argument("--no-color", action="store_true", help="never colorize the output")
-
-    scan_cmd = sub.add_parser("scan", parents=[common], help="scan this machine (default command)")
-    scan_cmd.add_argument("apps", nargs="*", help="scan only these catalog IDs")
-    scan_cmd.add_argument(
-        "-a", "--all", action="store_true", help="also report applications that are not installed"
+    scan_cmd = sub.add_parser(
+        "scan",
+        help="scan this machine (the default)",
+        description="Scan the apps on this machine and report which ones still send telemetry.",
+        epilog=EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    scan_cmd.add_argument("apps", nargs="*", metavar="app", help="scan only these apps (catalog IDs)")
     scan_cmd.add_argument(
-        "-v", "--verbose", action="store_true", help="show the file or variable each result came from"
+        "-v", "--verbose", action="store_true", help="show sources and how to turn off each hit"
     )
-    scan_cmd.add_argument("--fix", action="store_true", help="print the opt-out steps for every hit")
-    scan_cmd.add_argument(
-        "--export-env", action="store_true", help="print export lines for your shell profile"
-    )
-    scan_cmd.add_argument(
-        "--export-commands", action="store_true", help="print the opt-out commands (does not run them)"
-    )
+    scan_cmd.add_argument("--category", help="scan only one category")
+    scan_cmd.add_argument("--platform", help="linux, macos or windows (default: this machine)")
     scan_cmd.add_argument(
         "--run-commands",
         action="store_true",
-        help="let checks call the application itself (for example: brew analytics state)",
+        help="let checks run the app itself (for example: brew analytics state)",
     )
     scan_cmd.add_argument("--format", choices=["table", "json", "markdown"], default="table")
     scan_cmd.add_argument(
@@ -73,17 +64,17 @@ def build_parser() -> argparse.ArgumentParser:
         default="enabled",
         help="which status makes the exit code 1 (default: enabled)",
     )
+    scan_cmd.add_argument(
+        "--export-env", action="store_true", help="print export lines for your shell profile"
+    )
+    scan_cmd.add_argument(
+        "--export-commands", action="store_true", help="print the opt-out commands (does not run them)"
+    )
+    scan_cmd.add_argument("--no-color", action="store_true", help="never colorize the output")
+    # For tests and catalog work: also report every app that is not installed.
+    scan_cmd.add_argument("--all", action="store_true", help=argparse.SUPPRESS)
 
-    list_cmd = sub.add_parser("list", parents=[common], help="list the catalog")
-    list_cmd.add_argument("term", nargs="?", help="filter by name, ID or category")
-    list_cmd.add_argument("--format", choices=["table", "json", "markdown"], default="table")
-
-    show_cmd = sub.add_parser("show", parents=[common], help="show one catalog entry in full")
-    show_cmd.add_argument("app", help="catalog ID, for example: vscode")
-
-    sub.add_parser("categories", help="list the categories")
-
-    validate_cmd = sub.add_parser("validate", help="check catalog entries against app.schema.json")
+    validate_cmd = sub.add_parser("validate", description="Check catalog entries against app.schema.json.")
     validate_cmd.add_argument(
         "path", nargs="?", help="a directory of entries or one JSON file (default: the shipped catalog)"
     )
@@ -100,29 +91,56 @@ def _fail_statuses(fail_on: str) -> set[str]:
     return {ENABLED, PARTIAL, UNKNOWN, MANUAL}
 
 
+def _resolve_ids(names: list[str], catalog: Catalog) -> list[str] | str:
+    """Return catalog IDs for the names, or an error message."""
+    ids = []
+    for name in names:
+        app = catalog.get(name.lower())
+        matches = [app] if app else catalog.search(name)
+        if len(matches) == 1:
+            ids.append(matches[0].id)
+        elif matches:
+            return f"{name!r} matches several apps: " + ", ".join(m.id for m in matches)
+        else:
+            return f"no app named {name!r}. See https://github.com/aszenz/telescan/tree/main/telescan/data/apps.d"
+    return ids
+
+
 def cmd_scan(args: argparse.Namespace, catalog: Catalog) -> int:
-    platform = args.platform or current_platform()
+    if args.category and args.category.lower() not in catalog.categories():
+        report.write(
+            f"unknown category {args.category!r}. Use one of: {', '.join(catalog.categories())}\n", sys.stderr
+        )
+        return 2
+    ids = _resolve_ids(args.apps, catalog)
+    if isinstance(ids, str):
+        report.write(ids + "\n", sys.stderr)
+        return 2
     results = scan(
         catalog,
-        platform=platform,
+        # An app named on the command line is scanned on any platform.
+        platform=None if ids else args.platform or current_platform(),
         category=args.category,
-        only=args.apps or None,
+        only=ids or None,
         allow_commands=args.run_commands,
-        include_missing=args.all,
+        include_missing=args.all or bool(ids),
     )
     painter = report.Painter(not args.no_color and report.use_color(sys.stdout))
+    verbose = args.verbose or bool(ids)
 
     if args.format == "json":
         report.write(report.render_json(results))
     elif args.format == "markdown":
         report.write(report.render_markdown(results))
     else:
-        report.write(report.render_table(results, painter, verbose=args.verbose))
+        report.write(report.render_table(results, painter, verbose=verbose))
         report.write("\n" + report.render_summary(results, painter))
-        if args.fix:
-            report.write("\n" + report.render_fixes(results, painter))
+        if verbose:
+            report.write("\n" + report.render_fixes(results, painter, include_absent=bool(ids)))
         elif any(r.needs_action for r in results):
-            report.write(painter.dim("Run with --fix to see how to turn these off.\n"))
+            report.write(
+                painter.dim("Run 'telescan scan <app>' or 'telescan scan -v' to see how to turn these off.\n")
+            )
 
     if args.export_env:
         report.write("\n" + report.render_shell_profile(results))
@@ -131,54 +149,6 @@ def cmd_scan(args: argparse.Namespace, catalog: Catalog) -> int:
 
     fail = _fail_statuses(args.fail_on)
     return 1 if any(r.status in fail for r in results) else 0
-
-
-def cmd_list(args: argparse.Namespace, catalog: Catalog) -> int:
-    apps = catalog.search(args.term) if args.term else list(catalog)
-    if args.category:
-        apps = [a for a in apps if a.category.lower() == args.category.lower()]
-    if args.platform:
-        apps = [a for a in apps if args.platform in a.platforms]
-    if not apps:
-        report.write("No catalog entry matched.\n")
-        return 0
-    painter = report.Painter(not args.no_color and report.use_color(sys.stdout))
-    if args.format == "json":
-        report.write(report.render_json([scan_app(a, assume_installed=True) for a in apps]))
-        return 0
-    width = max(len(a.id) for a in apps)
-    for app in apps:
-        default = f"default: telemetry {app.default_state}"
-        report.write(f"{app.id.ljust(width)}  {app.name}\n")
-        report.write(f"{' ' * width}  {painter.dim(app.category + ' · ' + default)}\n")
-    report.write(f"\n{len(apps)} of {len(catalog)} catalog entries.\n")
-    return 0
-
-
-def cmd_show(args: argparse.Namespace, catalog: Catalog) -> int:
-    app = catalog.get(args.app)
-    if app is None:
-        matches = catalog.search(args.app)
-        if len(matches) == 1:
-            app = matches[0]
-        elif matches:
-            report.write("Did you mean: " + ", ".join(m.id for m in matches) + "\n")
-            return 2
-        else:
-            report.write(f"No catalog entry named {args.app!r}. Try: telescan list\n")
-            return 2
-    painter = report.Painter(not args.no_color and report.use_color(sys.stdout))
-    report.write(report.render_app_details(app, painter))
-    result = scan_app(app)
-    report.write(f"  on this machine: {painter.status(result.status)} ({result.reason})\n")
-    return 0
-
-
-def cmd_categories(catalog: Catalog) -> int:
-    for category in catalog.categories():
-        count = len(catalog.filter(category=category))
-        report.write(f"{category.ljust(20)} {count}\n")
-    return 0
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
@@ -195,32 +165,16 @@ def cmd_validate(args: argparse.Namespace) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    parser = build_parser()
-    known = {"scan", "list", "show", "categories", "validate"}
-    global_flags = {"-h", "--help", "--version"}
-    if not argv or (argv[0] not in known and argv[0] not in global_flags):
-        # "telescan" and "telescan --format json" both mean "telescan scan ...".
+    if not argv or (argv[0].startswith("-") and argv[0] not in ("-h", "--help", "--version")):
+        # "telescan" and "telescan -v" mean "telescan scan ...".  App names
+        # need "scan", so that new commands cannot clash with an app ID.
         argv.insert(0, "scan")
-    args = parser.parse_args(argv)
-    if args.command is None:
-        args = parser.parse_args(["scan"])
-
+    args = build_parser().parse_args(argv)
     if args.command == "validate":
         return cmd_validate(args)
-
     try:
         catalog = Catalog.load()
     except (OSError, ValueError) as error:
         report.write(f"catalog error: {error}\n", sys.stderr)
         return 2
-
-    if args.command == "scan":
-        return cmd_scan(args, catalog)
-    if args.command == "list":
-        return cmd_list(args, catalog)
-    if args.command == "show":
-        return cmd_show(args, catalog)
-    if args.command == "categories":
-        return cmd_categories(catalog)
-    parser.print_help()
-    return 2
+    return cmd_scan(args, catalog)

@@ -22,7 +22,7 @@ not need to change Python code.
   documentation.
 - **Update an application**: what changed, and a link that shows it.
 - **Wrong result**: what telescan reported, what you expected, and the
-  output of `telescan scan <id> -v`. Remove private paths first.
+  output of `telescan scan <id>`. Remove private paths first.
 
 ## Add or update an application
 
@@ -33,7 +33,7 @@ not need to change Python code.
    must be the same as the `id`.
 3. Add the evidence (see [Evidence rules](#evidence-rules)).
 4. Run `./telescan.py validate telescan/data/apps.d/<id>.json`.
-5. Run `./telescan.py scan <id> -v --all` and look at the result.
+5. Run `./telescan.py scan <id>` and look at the result.
 6. Add a test when you add or change a check (see
    [Test your change](#test-your-change)).
 7. Open a pull request. List the evidence, versions, platforms and scope.

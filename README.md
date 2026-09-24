@@ -23,15 +23,12 @@ Needs Python 3.9 or later. Works on Linux, macOS and Windows.
 
 ```sh
 telescan                  # scan this machine
-telescan scan --fix       # also show how to turn each one off
-telescan scan vscode      # scan one app
-telescan list             # see every app telescan knows
-telescan show homebrew    # details and sources for one app
+telescan scan vscode npm  # scan some apps, and show how to turn each one off
+telescan scan -v          # show sources and how to turn off every hit
 ```
 
 Each app gets a status: `ON`, `OFF`, `PARTIAL`, `UNKNOWN` or `MANUAL`.
 `MANUAL` means there is no local setting to read, so check it by hand.
-`--all` also lists apps that are not installed, as `ABSENT`.
 
 ## Features
 
