@@ -1,0 +1,56 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "vlc",
+  "name": "VLC media player",
+  "category": "desktop-apps",
+  "platforms": ["linux", "macos", "windows"],
+  "what": "VLC 3 has no usage analytics. Metadata network access sends media titles to online services to fetch cover art and metadata. Builds with the updater (Windows) check for updates every 3 days; the macOS Sparkle updater is not checked.",
+  "default_state": "unknown",
+  "detect": {
+    "which": ["vlc"],
+    "paths": [
+      "{config}/vlc/vlcrc",
+      "{home}/Library/Preferences/org.videolan.vlc",
+      "{appdata}/vlc/vlcrc"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "component": "metadata network access",
+      "files": [
+        "{config}/vlc/vlcrc",
+        "{home}/Library/Preferences/org.videolan.vlc/vlcrc",
+        "{appdata}/vlc/vlcrc"
+      ],
+      "disabled_pattern": "^metadata-network-access=0[ \\t]*$",
+      "enabled_pattern": "^metadata-network-access=1[ \\t]*$",
+      "default_state": "off"
+    },
+    {
+      "type": "regex",
+      "component": "update check",
+      "files": [
+        "{appdata}/vlc/vlcrc"
+      ],
+      "disabled_pattern": "^qt-updates-notif=0[ \\t]*$",
+      "enabled_pattern": "^qt-updates-notif=1[ \\t]*$",
+      "default_state": "unknown"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Tools > Preferences > Interface > Privacy / Network Interaction: clear \"Allow metadata network access\" and \"Activate updates notifier\", then save.",
+      "Or in vlcrc set metadata-network-access=0 and qt-updates-notif=0."
+    ]
+  },
+  "docs": "https://wiki.videolan.org/VLC_command-line_help/",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": ["service-data", "update-checks"],
+  "evidence": [
+    "https://github.com/videolan/vlc/blob/3.0.21/src/libvlc-module.c#L2116-L2117",
+    "https://github.com/videolan/vlc/blob/3.0.21/modules/gui/qt/qt.cpp#L260-L265",
+    "https://github.com/videolan/vlc/blob/3.0.21/modules/gui/qt/qt.cpp#L570-L578"
+  ]
+}

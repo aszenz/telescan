@@ -1,0 +1,51 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "kitty",
+  "name": "kitty terminal",
+  "category": "desktop-apps",
+  "platforms": [
+    "linux",
+    "macos"
+  ],
+  "what": "Official kitty binary builds fetch current-version.txt from the kitty website every 24 hours to check for updates. Distro packages and source builds do not check. The check reads only kitty.conf; included files and -o overrides are not read.",
+  "default_state": "unknown",
+  "detect": {
+    "which": [
+      "kitty"
+    ],
+    "paths": [
+      "{config}/kitty/kitty.conf",
+      "{home}/Library/Preferences/kitty/kitty.conf",
+      "{home}/Applications/kitty.app",
+      "/Applications/kitty.app"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "component": "update check",
+      "files": [
+        "{config}/kitty/kitty.conf",
+        "{home}/Library/Preferences/kitty/kitty.conf"
+      ],
+      "disabled_pattern": "^[ \\t]*update_check_interval[ \\t]+0+(\\.0*)?[ \\t]*$(?![\\s\\S]*^[ \\t]*update_check_interval[ \\t])",
+      "enabled_pattern": "^[ \\t]*update_check_interval[ \\t]+(?!0+(\\.0*)?[ \\t]*$)[0-9]*\\.?[0-9]+[ \\t]*$",
+      "default_state": "unknown"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Add the line \"update_check_interval 0\" to kitty.conf, then restart kitty (a config reload does not apply it)."
+    ]
+  },
+  "docs": "https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.update_check_interval",
+  "verification": "confirmed",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://github.com/kovidgoyal/kitty/blob/v0.49.1/kitty/options/definition.py#L3038-L3050",
+    "https://github.com/kovidgoyal/kitty/blob/v0.49.1/kitty/update_check.py"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "litellm",
+  "name": "LiteLLM",
+  "category": "ai-tools",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "The docs state that self-hosted LiteLLM runs no telemetry. On import, the library downloads the latest model cost map from raw.githubusercontent.com.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "litellm"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "LITELLM_LOCAL_MODEL_COST_MAP",
+      "disabled_when": [
+        "true"
+      ],
+      "enabled_when": [
+        "*nonempty*",
+        ""
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set LITELLM_LOCAL_MODEL_COST_MAP=True to use the cost map bundled with the package. The value is compared case-insensitively with \"true\".",
+      "Alternatively, LITELLM_MODEL_COST_MAP_URL can point to a mirror that you control. This check does not read it.",
+      "Callbacks that you configure (for example Langfuse or PostHog) send data by design and are not checked."
+    ],
+    "env": {
+      "LITELLM_LOCAL_MODEL_COST_MAP": "True"
+    }
+  },
+  "docs": "https://docs.litellm.ai/docs/data_security",
+  "verification": "confirmed",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://docs.litellm.ai/docs/data_security",
+    "https://github.com/BerriAI/litellm/blob/v1.101.2/litellm/litellm_core_utils/get_model_cost_map.py",
+    "https://github.com/BerriAI/litellm/blob/v1.101.2/litellm/__init__.py"
+  ]
+}

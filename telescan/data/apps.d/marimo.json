@@ -1,0 +1,53 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "marimo",
+  "name": "marimo",
+  "category": "editors",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "marimo edit asks marimo.io for the latest version, at most once a day. marimo has no usage analytics.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "marimo"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "MARIMO_SKIP_UPDATE_CHECK",
+      "exact": true,
+      "disabled_when": [
+        "1"
+      ],
+      "enabled_when": [
+        "*nonempty*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set MARIMO_SKIP_UPDATE_CHECK=1. Only the exact string 1 works.",
+      "Or run marimo edit --skip-update-check. telescan cannot see this flag.",
+      "There is no marimo.toml key for the update check."
+    ],
+    "env": {
+      "MARIMO_SKIP_UPDATE_CHECK": "1"
+    }
+  },
+  "docs": "https://docs.marimo.io/guides/configuration/",
+  "verification": "confirmed",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://docs.marimo.io/guides/configuration/",
+    "https://github.com/marimo-team/marimo/blob/0.25.0/marimo/_cli/cli.py#L588",
+    "https://github.com/marimo-team/marimo/blob/0.25.0/marimo/_cli/cli.py#L344-L350",
+    "https://github.com/marimo-team/marimo/blob/0.25.0/marimo/_cli/upgrade.py#L91-L124"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "libreoffice",
+  "name": "LibreOffice",
+  "category": "desktop-apps",
+  "platforms": ["linux", "macos", "windows"],
+  "what": "Crash reports to The Document Foundation (sent from a dialog after a crash) and automatic update checks. Both exist only in builds that include them, usually the official TDF builds; many Linux distro builds have neither. The check reads the user profile only, not system-wide finalized settings.",
+  "default_state": "unknown",
+  "detect": {
+    "which": ["libreoffice", "soffice"],
+    "paths": [
+      "{config}/libreoffice/4/user/registrymodifications.xcu",
+      "{appsupport}/LibreOffice/4/user/registrymodifications.xcu",
+      "{appdata}/LibreOffice/4/user/registrymodifications.xcu"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "component": "crash reports",
+      "files": [
+        "{config}/libreoffice/4/user/registrymodifications.xcu",
+        "{appsupport}/LibreOffice/4/user/registrymodifications.xcu",
+        "{appdata}/LibreOffice/4/user/registrymodifications.xcu"
+      ],
+      "disabled_pattern": "<item oor:path=\"/org\\.openoffice\\.Office\\.Common/Misc\"><prop oor:name=\"CrashReport\"[^>]*><value>false</value></prop></item>",
+      "enabled_pattern": "<item oor:path=\"/org\\.openoffice\\.Office\\.Common/Misc\"><prop oor:name=\"CrashReport\"[^>]*><value>true</value></prop></item>",
+      "default_state": "unknown"
+    },
+    {
+      "type": "regex",
+      "component": "update check",
+      "files": [
+        "{config}/libreoffice/4/user/registrymodifications.xcu",
+        "{appsupport}/LibreOffice/4/user/registrymodifications.xcu",
+        "{appdata}/LibreOffice/4/user/registrymodifications.xcu"
+      ],
+      "disabled_pattern": "<item oor:path=\"/org\\.openoffice\\.Office\\.Jobs/Jobs/org\\.openoffice\\.Office\\.Jobs:Job\\['UpdateCheck'\\]/Arguments\"><prop oor:name=\"AutoCheckEnabled\"[^>]*><value>false</value></prop></item>",
+      "enabled_pattern": "<item oor:path=\"/org\\.openoffice\\.Office\\.Jobs/Jobs/org\\.openoffice\\.Office\\.Jobs:Job\\['UpdateCheck'\\]/Arguments\"><prop oor:name=\"AutoCheckEnabled\"[^>]*><value>true</value></prop></item>",
+      "default_state": "unknown"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Tools > Options > LibreOffice > General: clear \"Send crash reports to The Document Foundation\" (only shown in builds with the crash reporter).",
+      "Tools > Options > LibreOffice > Online Update: clear \"Check for updates automatically\" (only shown in builds with the updater).",
+      "Or Tools > Options > Advanced > Open Expert Configuration: set CrashReport and AutoCheckEnabled to false.",
+      "Fleet wide: set both in a finalized .xcd file in the installation share/registry folder."
+    ]
+  },
+  "docs": "https://help.libreoffice.org/latest/en-US/text/shared/guide/error_report.html",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": ["crash-reporting", "update-checks"],
+  "evidence": [
+    "https://github.com/LibreOffice/core/blob/libreoffice-25.8.1.1/officecfg/registry/schema/org/openoffice/Office/Common.xcs#L5426-L5432",
+    "https://github.com/LibreOffice/core/blob/libreoffice-25.8.1.1/extensions/source/update/check/org/openoffice/Office/Jobs.xcu#L21-L28",
+    "https://help.libreoffice.org/latest/en-US/text/shared/guide/error_report.html"
+  ]
+}

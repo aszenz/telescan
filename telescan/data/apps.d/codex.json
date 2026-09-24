@@ -1,0 +1,70 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "codex",
+  "name": "OpenAI Codex CLI",
+  "category": "ai-tools",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends product analytics events and Statsig metrics (ab.chatgpt.com) to OpenAI, and checks for new versions at startup.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "codex"
+    ],
+    "paths": [
+      "{home}/.codex"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "component": "analytics",
+      "files": [
+        ".codex/config.toml",
+        "{home}/.codex/config.toml",
+        "/etc/codex/config.toml",
+        "{programdata}/OpenAI/Codex/config.toml"
+      ],
+      "disabled_pattern": "(?m)^[ \\t]*\\[analytics\\][ \\t]*(?:#[^\\n]*)?\\n(?:(?![ \\t]*\\[)[^\\n]*\\n)*?[ \\t]*enabled[ \\t]*=[ \\t]*false\\b",
+      "enabled_pattern": "(?m)^[ \\t]*\\[analytics\\][ \\t]*(?:#[^\\n]*)?\\n(?:(?![ \\t]*\\[)[^\\n]*\\n)*?[ \\t]*enabled[ \\t]*=[ \\t]*true\\b"
+    },
+    {
+      "type": "regex",
+      "component": "update-check",
+      "files": [
+        "{home}/.codex/config.toml",
+        "/etc/codex/config.toml",
+        "{programdata}/OpenAI/Codex/config.toml"
+      ],
+      "disabled_pattern": "\\A(?:(?![ \\t]*\\[)[^\\n]*\\n)*?[ \\t]*check_for_update_on_startup[ \\t]*=[ \\t]*false\\b",
+      "enabled_pattern": "\\A(?:(?![ \\t]*\\[)[^\\n]*\\n)*?[ \\t]*check_for_update_on_startup[ \\t]*=[ \\t]*true\\b"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Add an [analytics] table with enabled = false to ~/.codex/config.toml. This also turns off the Statsig metrics exporter. The check reads only the [analytics] table form, not dotted or inline forms, and not [profiles.*] tables.",
+      "To stop the startup update check, put check_for_update_on_startup = false at the top of ~/.codex/config.toml, before the first [table].",
+      "If CODEX_HOME is set, Codex reads $CODEX_HOME/config.toml instead of ~/.codex/config.toml. This check does not follow CODEX_HOME.",
+      "The /feedback upload is a separate, user-started flow ([feedback] enabled = false) and is not checked."
+    ]
+  },
+  "docs": "https://learn.chatgpt.com/docs/config-file/config-reference",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "usage-analytics",
+    "update-checks"
+  ],
+  "evidence": [
+    "https://learn.chatgpt.com/docs/config-file/config-reference",
+    "https://github.com/openai/codex/blob/rust-v0.156.1/codex-rs/config/src/types.rs",
+    "https://github.com/openai/codex/blob/rust-v0.156.1/codex-rs/core/src/config/mod.rs",
+    "https://github.com/openai/codex/blob/rust-v0.156.1/codex-rs/core/src/otel_init.rs",
+    "https://github.com/openai/codex/blob/rust-v0.156.1/codex-rs/analytics/src/client.rs",
+    "https://github.com/openai/codex/blob/rust-v0.156.1/codex-rs/tui/src/updates.rs",
+    "https://github.com/openai/codex/blob/rust-v0.156.1/codex-rs/config/src/loader/mod.rs"
+  ]
+}

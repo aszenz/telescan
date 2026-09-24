@@ -92,10 +92,9 @@ def render_table(results: list[Result], painter: Painter, verbose: bool = False)
         lines.append(line)
         if verbose:
             lines.append(f"{' ' * (status_w + 2)}{painter.dim('· ' + provenance(result.app))}")
-            for finding in result.findings:
-                lines.append(
-                    f"{' ' * (status_w + 2)}{painter.dim('· ' + finding.source + ': ' + finding.evidence)}"
-                )
+            # One setting can serve several components; show it once.
+            for source, evidence in dict.fromkeys((f.source, f.evidence) for f in result.findings):
+                lines.append(f"{' ' * (status_w + 2)}{painter.dim('· ' + source + ': ' + evidence)}")
     return "\n".join(lines) + "\n"
 
 

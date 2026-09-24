@@ -1,0 +1,98 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "copilot-cli",
+  "name": "GitHub Copilot CLI (copilot)",
+  "category": "ai-tools",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Sends usage telemetry to GitHub, also with a BYOK model provider, and downloads CLI updates automatically. Prompts sent to the model are out of scope.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "copilot"
+    ],
+    "paths": [
+      "{home}/.copilot"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "component": "telemetry",
+      "var": "COPILOT_OFFLINE",
+      "exact": true,
+      "disabled_when": [
+        "true"
+      ],
+      "enabled_when": [
+        "false"
+      ]
+    },
+    {
+      "type": "env",
+      "component": "auto-update",
+      "var": "COPILOT_OFFLINE",
+      "exact": true,
+      "disabled_when": [
+        "true"
+      ],
+      "enabled_when": [
+        "false"
+      ]
+    },
+    {
+      "type": "env",
+      "component": "auto-update",
+      "var": "COPILOT_AUTO_UPDATE",
+      "exact": true,
+      "disabled_when": [
+        "false"
+      ],
+      "enabled_when": [
+        "*nonempty*"
+      ]
+    },
+    {
+      "type": "json",
+      "component": "auto-update",
+      "key": "autoUpdate",
+      "files": [
+        "{home}/.copilot/settings.json"
+      ],
+      "disabled_when": [
+        false
+      ],
+      "enabled_when": [
+        true
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Copilot CLI has no telemetry-only switch. COPILOT_OFFLINE=true turns off telemetry, GitHub login, web tools, the GitHub MCP server and auto-update. It needs a local model provider (COPILOT_PROVIDER_BASE_URL).",
+      "To stop only automatic updates, set COPILOT_AUTO_UPDATE=false, start with --no-auto-update, or run /settings autoUpdate off (writes \"autoUpdate\": false to ~/.copilot/settings.json). Auto-update is off by default in CI.",
+      "If COPILOT_HOME is set, Copilot CLI reads settings.json from that directory. This check does not follow COPILOT_HOME.",
+      "Account-level Copilot data policies are a separate control (see the github-copilot entry)."
+    ],
+    "env": {
+      "COPILOT_AUTO_UPDATE": "false"
+    }
+  },
+  "docs": "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-byok-models",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "usage-analytics",
+    "update-checks"
+  ],
+  "evidence": [
+    "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-byok-models",
+    "https://github.blog/changelog/2026-04-07-copilot-cli-now-supports-byok-and-local-models/",
+    "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/change-settings",
+    "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference",
+    "https://github.com/github/copilot-cli/issues/3387"
+  ]
+}

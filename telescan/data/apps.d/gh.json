@@ -1,0 +1,114 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "gh",
+  "name": "GitHub CLI (gh)",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Since 2.91.0, sends pseudonymous command-usage telemetry to GitHub (not for GitHub Enterprise Server). Also checks GitHub for new gh and extension releases once a day in interactive terminals.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "gh"
+    ],
+    "paths": [
+      "{config}/gh",
+      "{config}/GitHub CLI"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "component": "telemetry",
+      "var": "GH_TELEMETRY",
+      "disabled_when": [
+        "",
+        "0",
+        "false",
+        "no",
+        "disabled",
+        "off",
+        "log"
+      ],
+      "enabled_when": [
+        "*nonempty*"
+      ]
+    },
+    {
+      "type": "env",
+      "component": "telemetry",
+      "var": "DO_NOT_TRACK",
+      "disabled_when": [
+        "1",
+        "true"
+      ]
+    },
+    {
+      "type": "regex",
+      "component": "telemetry",
+      "files": [
+        "{config}/gh/config.yml",
+        "{config}/GitHub CLI/config.yml"
+      ],
+      "disabled_pattern": "(?m)^telemetry:[ \\t]*[\\\"']?(?i:0|false|no|disabled|off|log)[\\\"']?[ \\t]*(?:#.*)?$",
+      "enabled_pattern": "(?m)^telemetry:[ \\t]*[\\\"']?(?i:enabled)[\\\"']?[ \\t]*(?:#.*)?$"
+    },
+    {
+      "type": "env",
+      "component": "update-notifier",
+      "var": "GH_NO_UPDATE_NOTIFIER",
+      "disabled_when": [
+        "*nonempty*"
+      ],
+      "enabled_when": [
+        ""
+      ]
+    },
+    {
+      "type": "env",
+      "component": "extension-update-notifier",
+      "var": "GH_NO_EXTENSION_UPDATE_NOTIFIER",
+      "disabled_when": [
+        "*nonempty*"
+      ],
+      "enabled_when": [
+        ""
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: gh config set telemetry disabled, or set GH_TELEMETRY=false (also 0, no, off, disabled or empty). DO_NOT_TRACK=1 or true also works.",
+      "GH_TELEMETRY has precedence over DO_NOT_TRACK, and both have precedence over the config. Any other GH_TELEMETRY value turns telemetry on. The value log prints the payload to stderr and does not send it.",
+      "Set GH_NO_UPDATE_NOTIFIER=1 and GH_NO_EXTENSION_UPDATE_NOTIFIER=1 to stop the daily release checks. gh skips them in CI, Codespaces and non-terminal output.",
+      "If GH_CONFIG_DIR is set, gh reads config.yml from that directory. This check does not follow GH_CONFIG_DIR.",
+      "gh versions before 2.91.0 send no telemetry. Extensions and GitHub Copilot CLI have their own controls."
+    ],
+    "commands": [
+      "gh config set telemetry disabled"
+    ],
+    "env": {
+      "GH_TELEMETRY": "false",
+      "GH_NO_UPDATE_NOTIFIER": "1",
+      "GH_NO_EXTENSION_UPDATE_NOTIFIER": "1"
+    }
+  },
+  "docs": "https://docs.github.com/en/github-cli/github-cli/github-cli-telemetry",
+  "verification": "confirmed",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "usage-analytics",
+    "update-checks"
+  ],
+  "evidence": [
+    "https://docs.github.com/en/github-cli/github-cli/github-cli-telemetry",
+    "https://github.com/cli/cli/blob/v2.101.0/internal/telemetry/telemetry.go",
+    "https://github.com/cli/cli/blob/v2.101.0/internal/config/config.go",
+    "https://github.com/cli/cli/blob/v2.101.0/internal/update/update.go",
+    "https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/root/help_topic.go",
+    "https://github.com/cli/cli/releases/tag/v2.91.0"
+  ]
+}

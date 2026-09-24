@@ -1,0 +1,60 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "pulumi",
+  "name": "Pulumi CLI",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "Each command asks api.pulumi.com for the latest CLI version. When you are logged in to Pulumi Cloud, the request also sends the command path, the names of set flags and the names of set PULUMI_* variables.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "pulumi"
+    ],
+    "paths": [
+      "{home}/.pulumi"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "PULUMI_SKIP_UPDATE_CHECK",
+      "exact": true,
+      "disabled_when": [
+        "1",
+        "true",
+        "True",
+        "TRUE"
+      ],
+      "enabled_when": [
+        "*nonempty*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Set PULUMI_SKIP_UPDATE_CHECK=true in your shell profile. Only 1 or true (any case) work. Values such as yes or on do not.",
+      "There is no config file key for this setting."
+    ],
+    "env": {
+      "PULUMI_SKIP_UPDATE_CHECK": "true"
+    }
+  },
+  "docs": "https://www.pulumi.com/docs/iac/cli/environment-variables/",
+  "verification": "confirmed",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "update-checks",
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://www.pulumi.com/docs/iac/cli/environment-variables/",
+    "https://github.com/pulumi/pulumi/blob/v3.264.0/sdk/go/common/env/env.go#L46",
+    "https://github.com/pulumi/pulumi/blob/v3.264.0/sdk/go/common/util/env/env.go#L338-L347",
+    "https://github.com/pulumi/pulumi/blob/v3.264.0/pkg/cmd/pulumi/pulumi.go#L411-L421",
+    "https://github.com/pulumi/pulumi/blob/v3.264.0/pkg/cmd/pulumi/pulumi.go#L703-L823"
+  ]
+}

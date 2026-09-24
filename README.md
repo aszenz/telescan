@@ -2,9 +2,9 @@
 
 ![logo](./docs/assets/telescan-logo-readme.png)
 
-telescan scans your machine for developer and desktop apps that still send
-telemetry, and tells you how to turn each one off. It is read-only: it changes
-nothing, and nothing leaves your machine.
+telescan reads the config files and environment variables of the developer
+and desktop apps on your machine, reports which ones still send telemetry, and
+shows how to turn each one off.
 
 ## Run it
 
@@ -35,8 +35,8 @@ Each app gets a status: `ON`, `OFF`, `PARTIAL`, `UNKNOWN` or `MANUAL`.
 
 ## Features
 
-- Covers 70 apps: editors, browsers, CLIs, frameworks, package managers and
-  operating systems.
+- Covers 87 apps: editors, browsers, AI and cloud CLIs, frameworks, package
+  managers, desktop apps and operating systems.
 - Prints the documented opt-out for each app, as steps, commands or
   environment variables (`--export-env`).
 - Links every result to the vendor documentation or source it is based on.

@@ -167,6 +167,73 @@ class TestCoverage(TempHome):
             ):
                 self.assertEqual(found(check).state, checks.DISABLED)
 
+    def test_npm_update_notifier_is_on_by_default(self) -> None:
+        self.assertEqual(self.scan("npm").status, checks.ENABLED)
+        self.write(".npmrc", "registry=https://registry.npmjs.org/\nupdate-notifier=false\n")
+        self.assertEqual(self.scan("npm").status, checks.DISABLED)
+
+    def test_verbose_output_lists_a_shared_setting_once(self) -> None:
+        self.write(".claude/settings.json", '{"env":{"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC":"1"}}')
+        with mock.patch("sys.stdout", new_callable=io.StringIO) as output:
+            main(["scan", "claude-code", "-v", "--no-color"])
+        details = [line for line in output.getvalue().splitlines() if "· " in line]
+        self.assertEqual(sum("CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC" in line for line in details), 1)
+
+    def components(self, name: str) -> dict[str, str]:
+        return {c.name: c.status for c in self.scan(name).components}
+
+    def test_codex_config_toml(self) -> None:
+        self.write(
+            ".codex/config.toml",
+            'model = "x"\ncheck_for_update_on_startup = false\n\n[analytics]\nenabled = false\n',
+        )
+        self.assertEqual(self.scan("codex").status, checks.DISABLED)
+        self.write(".codex/config.toml", "[analytics]\nenabled = false\n")
+        self.assertEqual(self.components("codex")["update-check"], checks.ENABLED)
+
+    def test_gh_config_yml(self) -> None:
+        self.write(".config/gh/config.yml", "git_protocol: ssh\ntelemetry: disabled\n")
+        self.assertEqual(self.components("gh")["telemetry"], checks.DISABLED)
+        self.write(".config/gh/config.yml", "telemetry: enabled\n")
+        self.assertEqual(self.components("gh")["telemetry"], checks.ENABLED)
+
+    def test_ngrok_update_check(self) -> None:
+        self.write(".config/ngrok/ngrok.yml", 'version: "3"\nagent:\n  update_check: false\n')
+        self.assertEqual(self.scan("ngrok").status, checks.DISABLED)
+
+    def test_sentry_cli_rc(self) -> None:
+        self.write(".sentryclirc", "[update]\ndisable_check = true\n")
+        self.assertEqual(self.scan("sentry-cli").status, checks.DISABLED)
+
+    def test_vlc_metadata_network_access(self) -> None:
+        self.write(".config/vlc/vlcrc", "[core]\nmetadata-network-access=1\n")
+        self.assertEqual(self.components("vlc")["metadata network access"], checks.ENABLED)
+        self.write(".config/vlc/vlcrc", "[core]\nmetadata-network-access=0\n")
+        self.assertEqual(self.components("vlc")["metadata network access"], checks.DISABLED)
+
+    def test_kitty_last_setting_wins(self) -> None:
+        self.write(".config/kitty/kitty.conf", "update_check_interval 24\nupdate_check_interval 0\n")
+        self.assertEqual(self.scan("kitty").status, checks.DISABLED)
+        self.write(".config/kitty/kitty.conf", "update_check_interval 0\nupdate_check_interval 24\n")
+        self.assertEqual(self.scan("kitty").status, checks.ENABLED)
+
+    def test_libreoffice_registry(self) -> None:
+        self.write(
+            ".config/libreoffice/4/user/registrymodifications.xcu",
+            '<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="CrashReport" oor:op="fuse">'
+            "<value>false</value></prop></item>\n"
+            "<item oor:path=\"/org.openoffice.Office.Jobs/Jobs/org.openoffice.Office.Jobs:Job['UpdateCheck']"
+            '/Arguments"><prop oor:name="AutoCheckEnabled" oor:op="fuse">'
+            "<value>false</value></prop></item>\n",
+        )
+        self.assertEqual(self.scan("libreoffice").status, checks.DISABLED)
+
+    def test_obsidian_updates(self) -> None:
+        self.write(".config/obsidian/obsidian.json", '{"vaults": {}, "updateDisabled": true}')
+        self.assertEqual(self.scan("obsidian").status, checks.DISABLED)
+        self.write(".config/obsidian/obsidian.json", '{"vaults": {}}')
+        self.assertEqual(self.scan("obsidian").status, checks.ENABLED)
+
     def test_corrected_catalog_controls(self) -> None:
         self.assertEqual(entry(self.catalog, "gemini-cli").checks[0]["key"], "privacy.usageStatisticsEnabled")
         self.assertEqual(entry(self.catalog, "cordova").default_state, "off")

@@ -1,0 +1,83 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "sentry",
+  "name": "Sentry CLI (sentry)",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "The newer sentry CLI sends errors, command spans and durations, with your user ID and email, to a Sentry project owned by Sentry. It also checks GitHub and npm for a new version about once a day.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "sentry"
+    ],
+    "paths": [
+      "{home}/.sentry/cli.db"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "component": "telemetry",
+      "var": "SENTRY_CLI_NO_TELEMETRY",
+      "exact": true,
+      "disabled_when": [
+        "1"
+      ]
+    },
+    {
+      "type": "env",
+      "component": "telemetry",
+      "var": "DO_NOT_TRACK",
+      "exact": true,
+      "disabled_when": [
+        "1"
+      ]
+    },
+    {
+      "type": "env",
+      "component": "update check",
+      "var": "SENTRY_CLI_NO_UPDATE_CHECK",
+      "exact": true,
+      "disabled_when": [
+        "1"
+      ],
+      "enabled_when": [
+        "*nonempty*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Run: sentry cli defaults telemetry off. The setting is stored in ~/.sentry/cli.db (SQLite). telescan cannot read it, so it reports ON when only this setting is off.",
+      "Or set SENTRY_CLI_NO_TELEMETRY=1. DO_NOT_TRACK=1 also works. Only the exact string 1 works for both.",
+      "To stop the update check, set SENTRY_CLI_NO_UPDATE_CHECK=1. Only the exact string 1 works."
+    ],
+    "commands": [
+      "sentry cli defaults telemetry off"
+    ],
+    "env": {
+      "SENTRY_CLI_NO_TELEMETRY": "1",
+      "SENTRY_CLI_NO_UPDATE_CHECK": "1"
+    }
+  },
+  "docs": "https://cli.sentry.dev",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting",
+    "update-checks"
+  ],
+  "evidence": [
+    "https://github.com/getsentry/cli/blob/0.44.1/packages/cli/src/lib/telemetry.ts#L120-L152",
+    "https://github.com/getsentry/cli/blob/0.44.1/packages/cli/src/lib/telemetry.ts#L64-L66",
+    "https://github.com/getsentry/cli/blob/0.44.1/packages/cli/src/lib/constants.ts#L99-L102",
+    "https://github.com/getsentry/cli/blob/0.44.1/packages/cli/src/lib/constants.ts#L126-L127",
+    "https://github.com/getsentry/cli/blob/0.44.1/packages/cli/src/lib/db/defaults.ts#L92",
+    "https://github.com/getsentry/cli/blob/0.44.1/packages/cli/src/lib/version-check.ts#L441-L443"
+  ]
+}

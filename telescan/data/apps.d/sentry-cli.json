@@ -1,0 +1,69 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "sentry-cli",
+  "name": "Sentry CLI (sentry-cli)",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "After some commands in an interactive terminal, asks the Sentry release registry for the latest version, at most every 12 hours. It sends no usage analytics or crash reports about itself.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "sentry-cli"
+    ]
+  },
+  "checks": [
+    {
+      "type": "env",
+      "var": "SENTRY_DISABLE_UPDATE_CHECK",
+      "exact": true,
+      "disabled_when": [
+        "1",
+        "true"
+      ],
+      "enabled_when": [
+        "*nonempty*"
+      ]
+    },
+    {
+      "type": "ini",
+      "section": "update",
+      "key": "disable_check",
+      "files": [
+        ".sentryclirc",
+        "{home}/.sentryclirc"
+      ],
+      "exact": true,
+      "disabled_when": [
+        "true"
+      ],
+      "enabled_when": [
+        "*nonempty*"
+      ]
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Add disable_check = true under [update] in ~/.sentryclirc. Only the lowercase string true works there.",
+      "Or set SENTRY_DISABLE_UPDATE_CHECK=1 (or true). When this variable is set to any value, sentry-cli ignores the config file key."
+    ],
+    "env": {
+      "SENTRY_DISABLE_UPDATE_CHECK": "1"
+    }
+  },
+  "docs": "https://docs.sentry.io/cli/configuration/",
+  "verification": "confirmed",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://docs.sentry.io/cli/configuration/",
+    "https://github.com/getsentry/sentry-cli/blob/3.8.0/src/config.rs#L583-L591",
+    "https://github.com/getsentry/sentry-cli/blob/3.8.0/src/utils/update.rs#L296-L326",
+    "https://github.com/getsentry/sentry-cli/blob/3.8.0/src/constants.rs#L24-L25"
+  ]
+}

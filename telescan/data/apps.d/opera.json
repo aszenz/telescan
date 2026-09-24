@@ -1,0 +1,33 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "opera",
+  "name": "Opera",
+  "category": "browsers",
+  "platforms": ["linux", "macos", "windows"],
+  "what": "Feature usage data tied to a random installation ID, and crash reports, go to Opera. Both are in-app opt-outs; the preference keys that store them are not verified.",
+  "default_state": "on",
+  "detect": {
+    "which": ["opera"],
+    "paths": [
+      "{config}/opera/Local State",
+      "{appsupport}/com.operasoftware.Opera/Local State",
+      "{appdata}/Opera Software/Opera Stable/Local State"
+    ]
+  },
+  "checks": [
+    { "type": "manual" }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > Privacy and security: turn off \"Help improve Opera by sending feature usage information\".",
+      "Settings > Privacy and security: turn off \"Automatically send crash reports to Opera\"."
+    ]
+  },
+  "docs": "https://www.opera.com/legal/privacy",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": ["usage-analytics", "crash-reporting"],
+  "evidence": [
+    "https://www.opera.com/legal/privacy"
+  ]
+}

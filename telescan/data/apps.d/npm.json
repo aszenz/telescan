@@ -8,8 +8,8 @@
     "macos",
     "windows"
   ],
-  "what": "No usage telemetry. The registry still sees install and audit requests, and the update notifier makes a separate version check.",
-  "default_state": "off",
+  "what": "The update notifier checks the registry for a newer npm version. It is on by default. npm has no usage telemetry; the registry still sees install and audit requests.",
+  "default_state": "on",
   "detect": {
     "which": [
       "npm"
@@ -25,12 +25,30 @@
       "enabled_when": [
         "true"
       ]
+    },
+    {
+      "type": "env",
+      "var": "NPM_CONFIG_UPDATE_NOTIFIER",
+      "disabled_when": [
+        "false"
+      ],
+      "enabled_when": [
+        "true"
+      ]
+    },
+    {
+      "type": "regex",
+      "files": [
+        ".npmrc",
+        "{home}/.npmrc"
+      ],
+      "disabled_pattern": "(?m)^\\s*update-notifier\\s*=\\s*false\\s*$",
+      "enabled_pattern": "(?m)^\\s*update-notifier\\s*=\\s*true\\s*$"
     }
   ],
   "disable": {
     "steps": [
-      "Nothing to opt out of.",
-      "To disable the update check, run: npm config set update-notifier false.",
+      "Run: npm config set update-notifier false",
       "Use --no-audit to skip audit requests. --no-fund only hides funding output."
     ],
     "commands": [
@@ -42,7 +60,7 @@
   },
   "docs": "https://docs.npmjs.com/cli/v10/using-npm/config#update-notifier",
   "verification": "qualified",
-  "verified_at": "2026-09-08",
+  "verified_at": "2026-09-24",
   "scope": [
     "update-checks"
   ],

@@ -1,0 +1,52 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "ngrok",
+  "name": "ngrok agent",
+  "category": "cloud-cli",
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "what": "The ngrok agent checks ngrok's servers for new versions of itself.",
+  "default_state": "on",
+  "detect": {
+    "which": [
+      "ngrok"
+    ]
+  },
+  "checks": [
+    {
+      "type": "regex",
+      "files": [
+        "{config}/ngrok/ngrok.yml",
+        "{appsupport}/ngrok/ngrok.yml",
+        "{localappdata}/ngrok/ngrok.yml",
+        "{home}/.ngrok2/ngrok.yml"
+      ],
+      "disabled_pattern": "^\\s*update_check:\\s*(false|False|FALSE)\\s*(#.*)?$",
+      "enabled_pattern": "^\\s*update_check:\\s*(true|True|TRUE)\\s*(#.*)?$"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Config version 3: add update_check: false under the agent: key in ngrok.yml.",
+      "Config version 2: add update_check: false as a top-level key.",
+      "Run ngrok config check to find the file. telescan does not read files set with --config or NGROK_CONFIG."
+    ],
+    "commands": [
+      "ngrok config check"
+    ]
+  },
+  "docs": "https://ngrok.com/docs/agent/config/v3/",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://ngrok.com/docs/agent/config/v3/",
+    "https://ngrok.com/docs/agent/config/v2/",
+    "https://ngrok.com/docs/agent/config/"
+  ]
+}

@@ -5,13 +5,11 @@ All notable changes are recorded here. The format follows
 
 ## Unreleased
 
-## 0.1.0
-
-First public preview.
-
-- Catalog of 70 applications, one JSON file per application, with a JSON Schema.
+- Catalog of 87 applications, one JSON file per application, with a JSON Schema.
 - Each entry records its verification level, audit date, scope and evidence.
   The output shows them.
 - Conflicting settings give `UNKNOWN`, not `OFF`.
 - Controls that depend on the version apply only to the matching versions.
 - Entries with no documented opt-out are `MANUAL`, not "no telemetry".
+- npm: the update notifier is on by default, and `~/.npmrc` is now read.
+- `-v` lists a setting once, even when several components use it.

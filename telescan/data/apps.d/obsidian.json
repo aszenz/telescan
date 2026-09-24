@@ -1,0 +1,45 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "obsidian",
+  "name": "Obsidian",
+  "category": "editors",
+  "platforms": ["linux", "macos", "windows"],
+  "what": "Obsidian says it collects no telemetry. The desktop app contacts Obsidian to check for and download updates. The Automatic updates switch is stored as \"updateDisabled\": true in obsidian.json (read from the shipped app, which is closed source). Users report that some update traffic can continue with the switch off. Community plugins are out of scope.",
+  "default_state": "on",
+  "detect": {
+    "which": ["obsidian"],
+    "paths": [
+      "{config}/obsidian/obsidian.json",
+      "{appsupport}/obsidian/obsidian.json",
+      "{appdata}/obsidian/obsidian.json"
+    ]
+  },
+  "checks": [
+    {
+      "type": "json",
+      "component": "automatic updates",
+      "key": "updateDisabled",
+      "files": [
+        "{config}/obsidian/obsidian.json",
+        "{appsupport}/obsidian/obsidian.json",
+        "{appdata}/obsidian/obsidian.json"
+      ],
+      "disabled_when": [true],
+      "enabled_when": [false],
+      "default_state": "on"
+    }
+  ],
+  "disable": {
+    "steps": [
+      "Settings > General: turn off Automatic updates. Obsidian then writes \"updateDisabled\": true to obsidian.json."
+    ]
+  },
+  "docs": "https://obsidian.md/help/updates",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": ["update-checks"],
+  "evidence": [
+    "https://obsidian.md/help/updates",
+    "https://obsidian.md/privacy"
+  ]
+}

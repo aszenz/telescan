@@ -181,11 +181,11 @@ def check_regex(check: Check) -> Finding | None:
             if disabled_re:
                 match = re.search(disabled_re, text, re.M)
                 if match:
-                    return Finding(DISABLED, match.group(0).strip()[:120], str(path))
+                    return Finding(DISABLED, " ".join(match.group(0).split())[:120], str(path))
             if enabled_re:
                 match = re.search(enabled_re, text, re.M)
                 if match:
-                    return Finding(ENABLED, match.group(0).strip()[:120], str(path))
+                    return Finding(ENABLED, " ".join(match.group(0).split())[:120], str(path))
     return None
 
 

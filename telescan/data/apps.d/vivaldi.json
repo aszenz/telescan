@@ -1,0 +1,34 @@
+{
+  "$schema": "../app.schema.json",
+  "id": "vivaldi",
+  "name": "Vivaldi",
+  "category": "browsers",
+  "platforms": ["linux", "macos", "windows"],
+  "what": "Every 24 hours each profile sends a unique user ID, version, CPU architecture and screen resolution to Vivaldi for user counting. There is no setting for this ping. Crash log sharing is a separate opt-in in the privacy settings; its stored preference is not verified.",
+  "default_state": "on",
+  "detect": {
+    "which": ["vivaldi", "vivaldi-stable"],
+    "paths": [
+      "{config}/vivaldi/Local State",
+      "{appsupport}/Vivaldi/Local State",
+      "{localappdata}/Vivaldi/User Data/Local State"
+    ]
+  },
+  "checks": [
+    { "type": "manual" }
+  ],
+  "disable": {
+    "steps": [
+      "The daily user ID ping has no setting. Block the traffic at the network level if this matters to you.",
+      "Settings > Privacy and Security: keep automated crash log sharing turned off."
+    ]
+  },
+  "docs": "https://vivaldi.com/privacy/browser/",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": ["usage-analytics", "crash-reporting"],
+  "evidence": [
+    "https://vivaldi.com/privacy/browser/",
+    "https://vivaldi.com/blog/privacy/how-not-to-track-product-usage/"
+  ]
+}
