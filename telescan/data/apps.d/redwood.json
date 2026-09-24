@@ -32,5 +32,15 @@
       "REDWOOD_DISABLE_TELEMETRY": "1"
     }
   },
-  "docs": "https://redwoodjs.com/docs/telemetry"
+  "docs": "https://redwoodjs.com/docs/telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://github.com/redwoodjs/redwood/blob/main/packages/telemetry/src/telemetry.ts",
+    "https://docs.redwoodjs.com/docs/cli-commands"
+  ]
 }

@@ -42,5 +42,14 @@
       "Telemetry is off in the build. Keep \"telemetry.telemetryLevel\": \"off\" to also mute extensions."
     ]
   },
-  "docs": "https://vscodium.com/#telemetry"
+  "docs": "https://vscodium.com/#telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "plugins"
+  ],
+  "evidence": [
+    "https://vscodium.com/"
+  ]
 }

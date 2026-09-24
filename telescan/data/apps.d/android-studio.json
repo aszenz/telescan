@@ -8,8 +8,8 @@
     "macos",
     "windows"
   ],
-  "what": "Sends usage statistics and crash reports to Google. The setting also covers the SDK command line tools.",
-  "default_state": "unknown",
+  "what": "Sends usage statistics and crash reports to Google after you opt in. The setting also covers the SDK command line tools.",
+  "default_state": "off",
   "detect": {
     "paths": [
       "{home}/.android"
@@ -23,18 +23,29 @@
         "{home}/.android/analytics.settings"
       ],
       "disabled_when": [
-        "*falsy*"
+        false
       ],
       "enabled_when": [
-        "*truthy*"
+        true
       ]
     }
   ],
   "disable": {
     "steps": [
       "Settings > Appearance & Behavior > System Settings > Data Sharing: clear the box.",
-      "Or set \"hasOptedIn\": false in ~/.android/analytics.settings."
+      "Or set \"hasOptedIn\": false in ~/.android/analytics.settings. If ANDROID_PREFS_ROOT or ANDROID_SDK_HOME is set, the file is in that directory instead."
     ]
   },
-  "docs": "https://developer.android.com/studio/preview/data-sharing"
+  "docs": "https://developer.android.com/studio/preview/data-sharing",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://developer.android.com/studio/intro/studio-config",
+    "https://android.googlesource.com/platform/tools/analytics-library/+/refs/heads/studio-main/shared/src/main/java/com/android/tools/analytics/AnalyticsSettings.kt",
+    "https://android.googlesource.com/platform/tools/analytics-library/+/refs/heads/studio-main/shared/src/main/java/com/android/tools/analytics/AnalyticsPaths.kt"
+  ]
 }

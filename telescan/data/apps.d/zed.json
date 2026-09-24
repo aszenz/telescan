@@ -52,5 +52,15 @@
       "Add to ~/.config/zed/settings.json: \"telemetry\": { \"diagnostics\": false, \"metrics\": false }"
     ]
   },
-  "docs": "https://zed.dev/docs/telemetry"
+  "docs": "https://zed.dev/docs/telemetry",
+  "verification": "confirmed",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://zed.dev/docs/telemetry",
+    "https://zed.dev/docs/reference/all-settings"
+  ]
 }

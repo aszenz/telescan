@@ -32,5 +32,13 @@
       "Leave OTEL_DENO unset."
     ]
   },
-  "docs": "https://docs.deno.com/runtime/fundamentals/open_telemetry/"
+  "docs": "https://docs.deno.com/runtime/fundamentals/open_telemetry/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://docs.deno.com/runtime/fundamentals/open_telemetry/"
+  ]
 }

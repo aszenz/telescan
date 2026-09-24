@@ -55,5 +55,13 @@
       "NEXT_TELEMETRY_DISABLED": "1"
     }
   },
-  "docs": "https://nextjs.org/telemetry"
+  "docs": "https://nextjs.org/telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://nextjs.org/telemetry"
+  ]
 }

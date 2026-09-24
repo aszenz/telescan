@@ -40,5 +40,13 @@
       "SLS_TELEMETRY_DISABLED": "1"
     }
   },
-  "docs": "https://www.serverless.com/framework/docs/guides/telemetry"
+  "docs": "https://www.serverless.com/framework/docs/guides/telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://github.com/serverless/serverless/blob/v3.40.0/lib/utils/telemetry/are-disabled.js"
+  ]
 }

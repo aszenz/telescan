@@ -1,7 +1,7 @@
 {
   "$schema": "../app.schema.json",
   "id": "aws-cdk",
-  "name": "AWS CDK 2.1100.0+",
+  "name": "AWS CDK",
   "category": "cloud-cli",
   "platforms": [
     "linux",
@@ -44,7 +44,8 @@
       ],
       "enabled_when": [
         "false"
-      ]
+      ],
+      "versions": ">=2.1100.0"
     }
   ],
   "disable": {
@@ -60,5 +61,24 @@
       "CDK_DISABLE_CLI_TELEMETRY": "true"
     }
   },
-  "docs": "https://docs.aws.amazon.com/cdk/v2/guide/cli-telemetry.html"
+  "docs": "https://docs.aws.amazon.com/cdk/v2/guide/cli-telemetry.html",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://docs.aws.amazon.com/cdk/v2/guide/cli-telemetry.html",
+    "https://docs.aws.amazon.com/cdk/v2/guide/usage-data.html"
+  ],
+  "version": {
+    "files": [
+      "node_modules/aws-cdk/package.json"
+    ],
+    "key": "version",
+    "argv": [
+      "cdk",
+      "--version"
+    ]
+  }
 }

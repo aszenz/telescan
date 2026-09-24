@@ -27,7 +27,8 @@
       ],
       "enabled_when": [
         "*truthy*"
-      ]
+      ],
+      "versions": "<13"
     }
   ],
   "disable": {
@@ -38,5 +39,20 @@
       "cordova telemetry off"
     ]
   },
-  "docs": "https://cordova.apache.org/announcements/2025/11/25/cordova-cli-13.0.0.html"
+  "docs": "https://cordova.apache.org/announcements/2025/11/25/cordova-cli-13.0.0.html",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://cordova.apache.org/announcements/2025/11/25/cordova-cli-13.0.0.html",
+    "https://cordova.apache.org/privacy/"
+  ],
+  "version": {
+    "argv": [
+      "cordova",
+      "--version"
+    ]
+  }
 }

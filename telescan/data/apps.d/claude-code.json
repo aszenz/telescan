@@ -130,5 +130,14 @@
       "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
     }
   },
-  "docs": "https://code.claude.com/docs/en/env-vars"
+  "docs": "https://code.claude.com/docs/en/env-vars",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://code.claude.com/docs/en/env-vars"
+  ]
 }

@@ -8,19 +8,31 @@
     "macos",
     "windows"
   ],
-  "what": "No telemetry in the toolchain.",
-  "default_state": "off",
+  "what": "The audit found no documented telemetry opt-out in cargo or rustup. That does not prove that the toolchain, registry requests, build scripts or external tools send no data.",
+  "default_state": "unknown",
   "detect": {
     "which": [
       "cargo",
       "rustup"
     ]
   },
-  "checks": [],
+  "checks": [
+    {
+      "type": "manual"
+    }
+  ],
   "disable": {
     "steps": [
-      "Nothing to turn off."
+      "No documented switch. Review the registries, build scripts and cargo subcommands you use."
     ]
   },
-  "docs": "https://www.rust-lang.org/"
+  "docs": "https://www.rust-lang.org/",
+  "verification": "unresolved",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://doc.rust-lang.org/cargo/reference/config.html"
+  ]
 }

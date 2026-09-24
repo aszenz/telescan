@@ -52,5 +52,14 @@
       "SNYK_DISABLE_ANALYTICS": "1"
     }
   },
-  "docs": "https://docs.snyk.io/snyk-cli/commands/config"
+  "docs": "https://docs.snyk.io/snyk-cli/commands/config",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://docs.snyk.io/developer-tools/snyk-cli/snyk-cli-analytics",
+    "https://docs.snyk.io/developer-tools/snyk-cli/commands/config"
+  ]
 }

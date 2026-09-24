@@ -42,5 +42,13 @@
       "Set \"privacy\": { \"usageStatisticsEnabled\": false } in ~/.gemini/settings.json, then restart Gemini CLI."
     ]
   },
-  "docs": "https://geminicli.com/docs/reference/configuration/"
+  "docs": "https://geminicli.com/docs/reference/configuration/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://geminicli.com/docs/reference/configuration/"
+  ]
 }

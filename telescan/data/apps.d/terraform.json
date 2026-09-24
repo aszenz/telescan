@@ -44,5 +44,13 @@
       "CHECKPOINT_DISABLE": "1"
     }
   },
-  "docs": "https://developer.hashicorp.com/terraform/cli/commands#disable_checkpoint"
+  "docs": "https://developer.hashicorp.com/terraform/cli/commands#disable_checkpoint",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://developer.hashicorp.com/terraform/cli/config/config-file"
+  ]
 }

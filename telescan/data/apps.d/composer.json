@@ -40,5 +40,13 @@
       "composer config --global notify-on-install false"
     ]
   },
-  "docs": "https://getcomposer.org/doc/06-config.md#notify-on-install"
+  "docs": "https://getcomposer.org/doc/06-config.md#notify-on-install",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "service-data"
+  ],
+  "evidence": [
+    "https://getcomposer.org/doc/06-config.md#notify-on-install"
+  ]
 }

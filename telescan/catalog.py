@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
 from dataclasses import dataclass, field, fields
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from . import schema as app_schema
 
@@ -24,6 +25,12 @@ class App:
     checks: list[dict[str, Any]] = field(default_factory=list)
     disable: dict[str, Any] = field(default_factory=dict)
     docs: str = ""
+    verification: str = "unresolved"
+    verified_at: str = ""
+    scope: list[str] = field(default_factory=list)
+    evidence: list[str] = field(default_factory=list)
+    versions: str = ""
+    version: dict[str, Any] = field(default_factory=dict)
 
     @property
     def steps(self) -> list[str]:
@@ -32,6 +39,14 @@ class App:
     @property
     def env(self) -> dict[str, str]:
         return dict(self.disable.get("env", {}))
+
+    @property
+    def version_note(self) -> str:
+        """The version range of the entry, or of each control that has one."""
+        if self.versions:
+            return self.versions
+        notes = (f"{c.get('component', 'telemetry')} {c['versions']}" for c in self.checks if "versions" in c)
+        return "; ".join(dict.fromkeys(notes))
 
     @property
     def commands(self) -> list[str]:
@@ -49,7 +64,7 @@ class Catalog:
         return len(self.apps)
 
     @classmethod
-    def load(cls, path: Path | None = None) -> "Catalog":
+    def load(cls, path: Path | None = None) -> Catalog:
         """Load the catalog.
 
         `path` is a directory of one file per application (the default), or
@@ -65,8 +80,9 @@ class Catalog:
         for origin, entry in entries:
             problems = app_schema.validate(entry, contract)
             if problems:
-                raise ValueError(f"{origin} does not match the schema:\n  - "
-                                 + "\n  - ".join(problems))
+                raise ValueError(f"{origin} does not match the schema:\n  - " + "\n  - ".join(problems))
+            if not entry.get("version") and any("versions" in c for c in entry.get("checks", [])):
+                raise ValueError(f'{origin}: a check has "versions" but the entry has no "version"')
             app_id = entry["id"]
             if app_id in seen:
                 raise ValueError(f"{origin}: duplicate app id: {app_id}")
@@ -95,9 +111,7 @@ class Catalog:
                 if unknown:
                     raise ValueError(f"{file.name}: unknown field(s) {unknown}")
                 if source.is_dir() and entry.get("id") != file.stem:
-                    raise ValueError(
-                        f"{file.name}: id {entry.get('id')!r} does not match the file name"
-                    )
+                    raise ValueError(f"{file.name}: id {entry.get('id')!r} does not match the file name")
                 entries.append((file.name, entry))
         return entries
 
@@ -115,9 +129,7 @@ class Catalog:
         return [
             app
             for app in self.apps
-            if term in app.id.lower()
-            or term in app.name.lower()
-            or term in app.category.lower()
+            if term in app.id.lower() or term in app.name.lower() or term in app.category.lower()
         ]
 
     def filter(

@@ -34,5 +34,13 @@
       "go telemetry off"
     ]
   },
-  "docs": "https://go.dev/doc/telemetry"
+  "docs": "https://go.dev/doc/telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://go.dev/doc/telemetry"
+  ]
 }

@@ -6,13 +6,12 @@ import argparse
 import sys
 from pathlib import Path
 
+from . import __version__ as VERSION
 from . import report
 from .catalog import DATA_DIR, Catalog
-from .checks import DISABLED, ENABLED, UNKNOWN
+from .checks import ENABLED, UNKNOWN
 from .paths import current_platform
-from .scanner import PARTIAL, MANUAL, scan, scan_app
-
-VERSION = "1.0.0"
+from .scanner import MANUAL, PARTIAL, scan, scan_app
 
 EPILOG = """\
 examples:
@@ -49,16 +48,31 @@ def build_parser() -> argparse.ArgumentParser:
 
     scan_cmd = sub.add_parser("scan", parents=[common], help="scan this machine (default command)")
     scan_cmd.add_argument("apps", nargs="*", help="scan only these catalog IDs")
-    scan_cmd.add_argument("-a", "--all", action="store_true", help="also report applications that are not installed")
-    scan_cmd.add_argument("-v", "--verbose", action="store_true", help="show the file or variable each result came from")
+    scan_cmd.add_argument(
+        "-a", "--all", action="store_true", help="also report applications that are not installed"
+    )
+    scan_cmd.add_argument(
+        "-v", "--verbose", action="store_true", help="show the file or variable each result came from"
+    )
     scan_cmd.add_argument("--fix", action="store_true", help="print the opt-out steps for every hit")
-    scan_cmd.add_argument("--export-env", action="store_true", help="print export lines for your shell profile")
-    scan_cmd.add_argument("--export-commands", action="store_true", help="print the opt-out commands (does not run them)")
-    scan_cmd.add_argument("--run-commands", action="store_true",
-                          help="let checks call the application itself (for example: brew analytics state)")
+    scan_cmd.add_argument(
+        "--export-env", action="store_true", help="print export lines for your shell profile"
+    )
+    scan_cmd.add_argument(
+        "--export-commands", action="store_true", help="print the opt-out commands (does not run them)"
+    )
+    scan_cmd.add_argument(
+        "--run-commands",
+        action="store_true",
+        help="let checks call the application itself (for example: brew analytics state)",
+    )
     scan_cmd.add_argument("--format", choices=["table", "json", "markdown"], default="table")
-    scan_cmd.add_argument("--fail-on", choices=["enabled", "unknown", "manual", "never"], default="enabled",
-                          help="which status makes the exit code 1 (default: enabled)")
+    scan_cmd.add_argument(
+        "--fail-on",
+        choices=["enabled", "unknown", "manual", "never"],
+        default="enabled",
+        help="which status makes the exit code 1 (default: enabled)",
+    )
 
     list_cmd = sub.add_parser("list", parents=[common], help="list the catalog")
     list_cmd.add_argument("term", nargs="?", help="filter by name, ID or category")
@@ -70,8 +84,9 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("categories", help="list the categories")
 
     validate_cmd = sub.add_parser("validate", help="check catalog entries against app.schema.json")
-    validate_cmd.add_argument("path", nargs="?",
-                              help="a directory of entries or one JSON file (default: the shipped catalog)")
+    validate_cmd.add_argument(
+        "path", nargs="?", help="a directory of entries or one JSON file (default: the shipped catalog)"
+    )
     return parser
 
 

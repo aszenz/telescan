@@ -39,5 +39,13 @@
       "EXPO_NO_TELEMETRY": "1"
     }
   },
-  "docs": "https://docs.expo.dev/"
+  "docs": "https://docs.expo.dev/",
+  "verification": "confirmed",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://docs.expo.dev/more/expo-cli/"
+  ]
 }

@@ -7,8 +7,9 @@ import os
 import sys
 from typing import TextIO
 
+from .catalog import App
 from .checks import DISABLED, ENABLED, UNKNOWN
-from .scanner import PARTIAL, MANUAL, NOT_INSTALLED, Result, summarize
+from .scanner import MANUAL, NOT_INSTALLED, PARTIAL, Result, summarize
 
 LABELS = {
     PARTIAL: "PARTIAL",
@@ -76,7 +77,10 @@ def render_table(results: list[Result], painter: Painter, verbose: bool = False)
     if not results:
         return "No application from the catalog was found on this machine.\n"
 
-    rows = [(painter.status(r.status), r.app.name, r.app.category, r.reason) for r in results]
+    rows = [
+        (painter.status(r.status), r.app.name, f"{r.app.category} · {r.app.verification}", r.reason)
+        for r in results
+    ]
     status_w = max(_plain_width(r[0]) for r in rows)
     name_w = min(38, max(len(r[1]) for r in rows))
 
@@ -87,11 +91,20 @@ def render_table(results: list[Result], painter: Painter, verbose: bool = False)
             line += f"\n{' ' * (status_w + 2)}{painter.dim(reason)}"
         lines.append(line)
         if verbose:
+            lines.append(f"{' ' * (status_w + 2)}{painter.dim('· ' + provenance(result.app))}")
             for finding in result.findings:
                 lines.append(
                     f"{' ' * (status_w + 2)}{painter.dim('· ' + finding.source + ': ' + finding.evidence)}"
                 )
     return "\n".join(lines) + "\n"
+
+
+def provenance(app: App) -> str:
+    """One line: verification, audit date, scope and version range."""
+    text = f"{app.verification}, audited {app.verified_at or 'never'}; scope: {', '.join(app.scope)}"
+    if app.version_note:
+        text += f"; versions: {app.version_note}"
+    return text
 
 
 def render_summary(results: list[Result], painter: Painter) -> str:
@@ -170,9 +183,21 @@ def render_json(results: list[Result]) -> str:
                 "reason": r.reason,
                 "what": r.app.what,
                 "docs": r.app.docs,
+                "verification": r.app.verification,
+                "verified_at": r.app.verified_at,
+                "scope": r.app.scope,
+                "versions": r.app.version_note,
+                "evidence": r.app.evidence,
+                "version": r.version,
                 "findings": [
-                    {"state": f.state, "evidence": f.evidence, "source": f.source,
-                     "component": f.component, "profile": f.profile} for f in r.findings
+                    {
+                        "state": f.state,
+                        "evidence": f.evidence,
+                        "source": f.source,
+                        "component": f.component,
+                        "profile": f.profile,
+                    }
+                    for f in r.findings
                 ],
                 "components": [
                     {"name": c.name, "status": c.status, "reason": c.reason, "profile": c.profile}
@@ -198,24 +223,37 @@ def render_markdown(results: list[Result]) -> str:
         f"{counts['total']} applications scanned: {counts[ENABLED]} on, {counts[DISABLED]} off, "
         f"{counts[PARTIAL]} partial, {counts[UNKNOWN]} unknown, {counts[MANUAL]} manual.",
         "",
-        "| Status | Application | Category | Detail | Docs |",
-        "| --- | --- | --- | --- | --- |",
+        "| Status | Application | Category | Verification | Scope | Detail | Docs |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for r in results:
         reason = r.reason.replace("|", "\\|")
         docs = f"[docs]({r.app.docs})" if r.app.docs else ""
-        lines.append(f"| {LABELS[r.status]} | {r.app.name} | {r.app.category} | {reason} | {docs} |")
+        verification = f"{r.app.verification} ({r.app.verified_at})"
+        scope = ", ".join(r.app.scope)
+        if r.app.version_note:
+            scope += f"; versions: {r.app.version_note}"
+        lines.append(
+            f"| {LABELS[r.status]} | {r.app.name} | {r.app.category} | {verification} | {scope} "
+            f"| {reason} | {docs} |"
+        )
     lines.append("")
     return "\n".join(lines) + "\n"
 
 
-def render_app_details(app, painter: Painter) -> str:
+def render_app_details(app: App, painter: Painter) -> str:
     lines = [
         painter.bold(f"{app.name}  ({app.id})"),
         f"  category   {app.category}",
         f"  platforms  {', '.join(app.platforms)}",
         f"  default    telemetry is {app.default_state} out of the box",
         f"  what       {app.what}",
+        f"  scope      {', '.join(app.scope)}",
+        f"  verified   {app.verification} ({app.verified_at or 'never'})",
+    ]
+    if app.version_note:
+        lines.append(f"  versions   {app.version_note}")
+    lines += [
         "",
         painter.bold("  How to turn it off:"),
     ]
@@ -226,6 +264,8 @@ def render_app_details(app, painter: Painter) -> str:
             lines.append(f"    - export {key}={value}")
     if app.docs:
         lines += ["", f"  docs       {app.docs}"]
+    for url in app.evidence:
+        lines.append(f"  evidence   {url}")
     lines.append("")
     return "\n".join(lines)
 

@@ -38,5 +38,14 @@
       "In mongosh run: disableTelemetry()"
     ]
   },
-  "docs": "https://www.mongodb.com/docs/mongodb-shell/telemetry/"
+  "docs": "https://www.mongodb.com/docs/mongodb-shell/telemetry/",
+  "verification": "confirmed",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://www.mongodb.com/docs/mongodb-shell/telemetry/",
+    "https://www.mongodb.com/community/forums/t/how-to-check-status-of-mongosh-telemetry/249531"
+  ]
 }

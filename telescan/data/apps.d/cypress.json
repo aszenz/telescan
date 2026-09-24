@@ -41,5 +41,13 @@
       "CYPRESS_CRASH_REPORTS": "0"
     }
   },
-  "docs": "https://docs.cypress.io/app/references/advanced-installation"
+  "docs": "https://docs.cypress.io/app/references/advanced-installation",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://docs.cypress.io/app/references/advanced-installation"
+  ]
 }

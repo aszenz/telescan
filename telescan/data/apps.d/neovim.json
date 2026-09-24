@@ -8,19 +8,32 @@
     "macos",
     "windows"
   ],
-  "what": "No telemetry in the editor. Plugins and language servers can still call home.",
-  "default_state": "off",
+  "what": "The audit found no documented telemetry opt-out in the editor. That does not prove that every build, plugin or language server sends no data.",
+  "default_state": "unknown",
   "detect": {
     "which": [
       "nvim",
       "vim"
     ]
   },
-  "checks": [],
+  "checks": [
+    {
+      "type": "manual"
+    }
+  ],
   "disable": {
     "steps": [
-      "Nothing to turn off. Audit the plugins and language servers you install."
+      "No documented switch. Audit the plugins and language servers you install."
     ]
   },
-  "docs": "https://neovim.io/"
+  "docs": "https://neovim.io/",
+  "verification": "unresolved",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "plugins"
+  ],
+  "evidence": [
+    "https://neovim.io/doc/user/"
+  ]
 }

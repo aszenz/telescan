@@ -35,5 +35,13 @@
       "CHECKPOINT_DISABLE": "1"
     }
   },
-  "docs": "https://developer.hashicorp.com/packer/docs/configure"
+  "docs": "https://developer.hashicorp.com/packer/docs/configure",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://developer.hashicorp.com/packer/docs/configure"
+  ]
 }

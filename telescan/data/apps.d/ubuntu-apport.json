@@ -42,5 +42,14 @@
       "ubuntu-report send no"
     ]
   },
-  "docs": "https://wiki.ubuntu.com/Apport"
+  "docs": "https://wiki.ubuntu.com/Apport",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://wiki.ubuntu.com/Apport",
+    "https://documentation.ubuntu.com/project/contributors/qa-and-testing/report-a-bug/"
+  ]
 }

@@ -35,5 +35,14 @@
       "yarn config set --home enableTelemetry 0"
     ]
   },
-  "docs": "https://yarnpkg.com/advanced/telemetry"
+  "docs": "https://yarnpkg.com/advanced/telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://yarnpkg.com/advanced/telemetry",
+    "https://yarnpkg.com/configuration/yarnrc/"
+  ]
 }

@@ -58,8 +58,9 @@ def _resolve(ref: str, root: dict[str, Any]) -> dict[str, Any]:
     return node
 
 
-def validate(instance: Any, schema: dict[str, Any], root: dict[str, Any] | None = None,
-             where: str = "") -> list[str]:
+def validate(
+    instance: Any, schema: dict[str, Any], root: dict[str, Any] | None = None, where: str = ""
+) -> list[str]:
     """Return a list of human readable problems.  Empty means valid."""
     root = root if root is not None else schema
     errors: list[str] = []
@@ -128,9 +129,12 @@ def validate(instance: Any, schema: dict[str, Any], root: dict[str, Any] | None 
     if "anyOf" in schema:
         branches = [validate(instance, sub, root, where) for sub in schema["anyOf"]]
         if all(branches):
-            fail("matches none of: " + "; ".join(
-                ", ".join(problem.split(": ", 1)[-1] for problem in branch)
-                for branch in branches))
+            fail(
+                "matches none of: "
+                + "; ".join(
+                    ", ".join(problem.split(": ", 1)[-1] for problem in branch) for branch in branches
+                )
+            )
     if "if" in schema:
         if not validate(instance, schema["if"], root, where):
             if "then" in schema:

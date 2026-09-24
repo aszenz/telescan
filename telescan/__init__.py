@@ -1,5 +1,5 @@
 """telescan - find the applications that still send telemetry."""
 
-from .cli import VERSION as __version__
+__version__ = "0.1.0"
 
 __all__ = ["__version__"]

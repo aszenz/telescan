@@ -54,5 +54,16 @@
       "FLUTTER_SUPPRESS_ANALYTICS": "true"
     }
   },
-  "docs": "https://docs.flutter.dev/reference/crash-reporting"
+  "docs": "https://docs.flutter.dev/reference/crash-reporting",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://docs.flutter.dev/reference/crash-reporting",
+    "https://github.com/flutter/flutter/blob/master/packages/flutter_tools/lib/src/reporting/unified_analytics.dart",
+    "https://github.com/dart-lang/tools/blob/main/pkgs/unified_analytics/lib/src/config_handler.dart"
+  ]
 }

@@ -8,18 +8,30 @@
     "macos",
     "windows"
   ],
-  "what": "No telemetry.",
-  "default_state": "off",
+  "what": "The audit found no documented telemetry opt-out. That does not prove that pnpm sends no data. Registry requests, hooks and plugins are separate.",
+  "default_state": "unknown",
   "detect": {
     "which": [
       "pnpm"
     ]
   },
-  "checks": [],
+  "checks": [
+    {
+      "type": "manual"
+    }
+  ],
   "disable": {
     "steps": [
-      "Nothing to turn off."
+      "No documented switch. Review the registries, hooks and plugins you use."
     ]
   },
-  "docs": "https://pnpm.io/"
+  "docs": "https://pnpm.io/",
+  "verification": "unresolved",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://pnpm.io/settings"
+  ]
 }

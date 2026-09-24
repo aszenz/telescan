@@ -20,28 +20,46 @@
     {
       "type": "env",
       "var": "SF_DISABLE_TELEMETRY",
+      "exact": true,
       "disabled_when": [
-        "*truthy*"
+        "true"
       ],
       "enabled_when": [
-        "*falsy*"
+        "*nonempty*"
       ]
     },
     {
       "type": "env",
       "var": "SFDX_DISABLE_TELEMETRY",
+      "exact": true,
       "disabled_when": [
-        "*truthy*"
+        "true"
       ],
       "enabled_when": [
-        "*falsy*"
+        "*nonempty*"
+      ]
+    },
+    {
+      "type": "json",
+      "key": "disable-telemetry",
+      "files": [
+        ".sf/config.json",
+        "{home}/.sf/config.json"
+      ],
+      "exact": true,
+      "disabled_when": [
+        "true"
+      ],
+      "enabled_when": [
+        "*nonempty*"
       ]
     }
   ],
   "disable": {
     "steps": [
       "Run: sf config set disable-telemetry=true --global",
-      "Or set SF_DISABLE_TELEMETRY=true."
+      "Or set SF_DISABLE_TELEMETRY=true. Only the lowercase string \"true\" works.",
+      "Legacy ~/.sfdx/sfdx-config.json settings are not read by this check."
     ],
     "commands": [
       "sf config set disable-telemetry=true --global"
@@ -50,5 +68,18 @@
       "SF_DISABLE_TELEMETRY": "true"
     }
   },
-  "docs": "https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_dev_cli_telemetry.htm"
+  "docs": "https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_dev_cli_telemetry.htm",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://github.com/salesforcecli/plugin-telemetry",
+    "https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_dev_cli_telemetry.htm",
+    "https://github.com/forcedotcom/telemetry/blob/main/src/enabledCheck.ts",
+    "https://github.com/forcedotcom/sfdx-core/blob/main/src/config/envVars.ts",
+    "https://github.com/forcedotcom/sfdx-core/blob/main/src/config/configAggregator.ts"
+  ]
 }

@@ -28,5 +28,14 @@
       "There is no local file to flip."
     ]
   },
-  "docs": "https://explore.zoom.us/en/privacy/"
+  "docs": "https://explore.zoom.us/en/privacy/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "service-data"
+  ],
+  "evidence": [
+    "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0057779"
+  ]
 }

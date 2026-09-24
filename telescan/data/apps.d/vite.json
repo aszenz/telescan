@@ -8,8 +8,8 @@
     "macos",
     "windows"
   ],
-  "what": "No telemetry.",
-  "default_state": "off",
+  "what": "The audit found no documented telemetry opt-out in Vite core. That does not prove that Vite, its plugins or its integrations send no data.",
+  "default_state": "unknown",
   "detect": {
     "which": [
       "vite"
@@ -18,11 +18,23 @@
       "node_modules/vite"
     ]
   },
-  "checks": [],
+  "checks": [
+    {
+      "type": "manual"
+    }
+  ],
   "disable": {
     "steps": [
-      "Nothing to turn off."
+      "No documented switch. Review the plugins and integrations you use."
     ]
   },
-  "docs": "https://vite.dev/"
+  "docs": "https://vite.dev/",
+  "verification": "unresolved",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://vite.dev/guide/"
+  ]
 }

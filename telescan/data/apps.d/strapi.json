@@ -49,5 +49,14 @@
       "STRAPI_TELEMETRY_DISABLED": "1"
     }
   },
-  "docs": "https://docs.strapi.io/cms/data-management/telemetry"
+  "docs": "https://docs.strapi.io/cms/data-management/telemetry",
+  "verification": "confirmed",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://docs.strapi.io/cms/configurations/environment",
+    "https://github.com/strapi/strapi/blob/main/packages/core/core/src/services/metrics/index.ts"
+  ]
 }

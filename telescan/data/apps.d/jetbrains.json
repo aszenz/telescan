@@ -35,5 +35,14 @@
       "For a fleet, ship an idea.properties with the Data Sharing consent already declined."
     ]
   },
-  "docs": "https://www.jetbrains.com/help/idea/settings-usage-statistics.html"
+  "docs": "https://www.jetbrains.com/help/idea/settings-usage-statistics.html",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://www.jetbrains.com/help/idea/settings-usage-statistics.html",
+    "https://blog.jetbrains.com/idea/2021/03/incident-the-data-sharing-dialog-repeatedly-appearing/"
+  ]
 }

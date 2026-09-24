@@ -28,5 +28,14 @@
       "System Settings > Privacy & Security > Analytics & Improvements: turn off every option."
     ]
   },
-  "docs": "https://support.apple.com/guide/mac-help/share-analytics-information-mac-apple-mh27990/mac"
+  "docs": "https://support.apple.com/guide/mac-help/share-analytics-information-mac-apple-mh27990/mac",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://support.apple.com/en-mide/guide/mac-help/mh27990/26/mac/26"
+  ]
 }

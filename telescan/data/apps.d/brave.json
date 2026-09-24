@@ -39,5 +39,14 @@
       "Settings > Privacy and security: turn off product analytics (P3A), diagnostic reports and daily usage ping."
     ]
   },
-  "docs": "https://brave.com/privacy/browser/"
+  "docs": "https://brave.com/privacy/browser/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://github.com/brave/brave-core/blob/master/components/p3a/pref_names.h",
+    "https://brave.com/privacy/browser/"
+  ]
 }

@@ -56,5 +56,14 @@
       "WRANGLER_SEND_METRICS": "false"
     }
   },
-  "docs": "https://developers.cloudflare.com/workers/wrangler/telemetry/"
+  "docs": "https://developers.cloudflare.com/workers/wrangler/telemetry/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://developers.cloudflare.com/workers/wrangler/commands/general/",
+    "https://github.com/cloudflare/workers-sdk/blob/main/packages/wrangler/src/metrics/metrics-config.ts"
+  ]
 }

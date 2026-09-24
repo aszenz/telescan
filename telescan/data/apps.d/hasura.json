@@ -52,5 +52,13 @@
       "HASURA_GRAPHQL_ENABLE_TELEMETRY": "false"
     }
   },
-  "docs": "https://hasura.io/docs/2.0/policies/telemetry/"
+  "docs": "https://hasura.io/docs/2.0/policies/telemetry/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://hasura.io/docs/2.0/policies/telemetry/"
+  ]
 }

@@ -30,5 +30,14 @@
       "Privacy Mode restricts storage and training; AI requests still send the context needed to provide the feature."
     ]
   },
-  "docs": "https://cursor.com/security"
+  "docs": "https://cursor.com/security",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "ai-data"
+  ],
+  "evidence": [
+    "https://cursor.com/security",
+    "https://prod.cursor.com/help/security-and-privacy/privacy"
+  ]
 }

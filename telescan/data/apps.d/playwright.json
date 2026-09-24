@@ -8,8 +8,8 @@
     "macos",
     "windows"
   ],
-  "what": "No usage telemetry. It does download browser builds from a Microsoft CDN.",
-  "default_state": "off",
+  "what": "The audit found no documented telemetry opt-out. Playwright downloads browser builds from a Microsoft CDN. That does not prove that it sends no usage data.",
+  "default_state": "unknown",
   "detect": {
     "which": [
       "playwright"
@@ -18,11 +18,24 @@
       "node_modules/@playwright"
     ]
   },
-  "checks": [],
+  "checks": [
+    {
+      "type": "manual"
+    }
+  ],
   "disable": {
     "steps": [
-      "Nothing to turn off."
+      "No documented switch. Review browser downloads and the services your tests call."
     ]
   },
-  "docs": "https://playwright.dev/"
+  "docs": "https://playwright.dev/",
+  "verification": "unresolved",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://playwright.dev/docs/browsers",
+    "https://playwright.dev/docs/test-use-options"
+  ]
 }

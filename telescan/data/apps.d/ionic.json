@@ -41,5 +41,14 @@
       "ionic config set -g telemetry false"
     ]
   },
-  "docs": "https://ionicframework.com/docs/cli/telemetry"
+  "docs": "https://ionicframework.com/docs/cli/telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://github.com/ionic-team/ionic-cli/blob/develop/packages/%40ionic/cli/src/lib/telemetry.ts",
+    "https://github.com/ionic-team/ionic-cli/blob/develop/packages/%40ionic/cli/src/lib/config.ts"
+  ]
 }

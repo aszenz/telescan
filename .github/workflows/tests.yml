@@ -6,6 +6,20 @@ on:
   pull_request:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install the pinned development tools from uv.lock
+        run: uv sync --locked
+      - name: Check the formatting
+        run: uv run ruff format --check .
+      - name: Lint
+        run: uv run ruff check .
+      - name: Type check
+        run: uv run ty check
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -25,3 +39,21 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Run the scanner
         run: python telescan.py scan --all --fail-on never
+
+  package:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Build the wheel and the source distribution
+        run: uv build
+      - name: Check the package metadata
+        shell: bash
+        run: uv run --locked twine check dist/*
+      - name: Install the wheel in a clean environment and test it
+        shell: bash
+        run: uv run --isolated --no-project --with dist/*.whl scripts/smoke_test.py

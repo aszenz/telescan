@@ -28,5 +28,15 @@
       "Block third party trackers at the network level if this matters to you."
     ]
   },
-  "docs": "https://slack.com/trust/privacy/privacy-policy"
+  "docs": "https://slack.com/trust/privacy/privacy-policy",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "service-data"
+  ],
+  "evidence": [
+    "https://slack.com/help/articles/360057613913-Manage-permissions-for-the-Slack-analytics-dashboard",
+    "https://slack.com/trust/privacy/privacy-policy"
+  ]
 }

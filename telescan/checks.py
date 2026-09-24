@@ -18,16 +18,20 @@ import os
 import re
 import shutil
 import subprocess
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
 
-from . import paths
+from . import paths, versions
 
 DISABLED = "disabled"
 ENABLED = "enabled"
 UNKNOWN = "unknown"
 
 TRUE_WORDS = {"1", "true", "yes", "on", "enabled"}
+# One check, or the `version` reader, of a catalog entry: parsed JSON.
+Check = dict[str, Any]
+
 FALSE_WORDS = {"0", "false", "no", "off", "disabled", "none"}
 
 
@@ -50,7 +54,7 @@ def _normalize(value: Any) -> str:
     return str(value).strip().lower()
 
 
-def _matches(value: Any, wanted: Iterable[Any]) -> bool:
+def _matches(value: Any, wanted: Iterable[Any], exact: bool = False) -> bool:
     got = _normalize(value)
     for item in wanted:
         item_norm = _normalize(item)
@@ -63,15 +67,21 @@ def _matches(value: Any, wanted: Iterable[Any]) -> bool:
         elif item_norm == "*falsy*":
             if got in FALSE_WORDS:
                 return True
+        elif exact:
+            # The application compares strings as they are: no case folding,
+            # and a JSON boolean is not the string "true".
+            if isinstance(value, str) and value == item:
+                return True
         elif got == item_norm:
             return True
     return False
 
 
-def _state_for(value: Any, check: dict) -> str:
-    if _matches(value, check.get("disabled_when", [])):
+def _state_for(value: Any, check: Check) -> str:
+    exact = check.get("exact", False)
+    if _matches(value, check.get("disabled_when", []), exact):
         return DISABLED
-    if _matches(value, check.get("enabled_when", [])):
+    if _matches(value, check.get("enabled_when", []), exact):
         return ENABLED
     return UNKNOWN
 
@@ -111,7 +121,7 @@ def json_lookup(data: Any, key: str) -> tuple[bool, Any]:
 # --- checks -----------------------------------------------------------------
 
 
-def check_env(check: dict) -> Finding | None:
+def check_env(check: Check) -> Finding | None:
     name = check["var"]
     if name not in os.environ:
         return None
@@ -120,7 +130,7 @@ def check_env(check: dict) -> Finding | None:
     return Finding(state, f"{name}={value}", "environment")
 
 
-def check_json(check: dict) -> Finding | None:
+def check_json(check: Check) -> Finding | None:
     key = check["key"]
     for pattern in check["files"]:
         for path in paths.expand_glob(pattern):
@@ -130,7 +140,7 @@ def check_json(check: dict) -> Finding | None:
                 data = read_jsonc(path.read_text(encoding="utf-8", errors="replace"))
             except (ValueError, OSError) as error:
                 return Finding(UNKNOWN, f"cannot read JSON: {error}", str(path))
-            found, value = json_lookup(data, key)
+            found, value = json_lookup(data, str(key))
             if not found:
                 continue
             state = _state_for(value, check)
@@ -138,7 +148,7 @@ def check_json(check: dict) -> Finding | None:
     return None
 
 
-def check_ini(check: dict) -> Finding | None:
+def check_ini(check: Check) -> Finding | None:
     section = check.get("section", "DEFAULT")
     key = check["key"]
     for pattern in check["files"]:
@@ -157,7 +167,7 @@ def check_ini(check: dict) -> Finding | None:
     return None
 
 
-def check_regex(check: dict) -> Finding | None:
+def check_regex(check: Check) -> Finding | None:
     disabled_re = check.get("disabled_pattern")
     enabled_re = check.get("enabled_pattern")
     for pattern in check["files"]:
@@ -179,7 +189,7 @@ def check_regex(check: dict) -> Finding | None:
     return None
 
 
-def check_file(check: dict) -> Finding | None:
+def check_file(check: Check) -> Finding | None:
     """A file that only exists when telemetry is off (or on)."""
     state_when_present = check.get("present", DISABLED)
     for pattern in check["files"]:
@@ -189,7 +199,7 @@ def check_file(check: dict) -> Finding | None:
     return None
 
 
-def check_command(check: dict, allow_commands: bool) -> Finding | None:
+def check_command(check: Check, allow_commands: bool) -> Finding | None:
     if not allow_commands:
         return None
     argv = check["argv"]
@@ -217,7 +227,32 @@ def check_command(check: dict, allow_commands: bool) -> Finding | None:
     return Finding(UNKNOWN, "command output did not match a known state", " ".join(argv))
 
 
-def run_check(check: dict, allow_commands: bool = False) -> Finding | None:
+def read_version(spec: Check, allow_commands: bool = False) -> str | None:
+    """Read the installed version as described by the entry's `version`.
+    Return None when it cannot be read."""
+    key = spec.get("key")
+    patterns = spec.get("files", []) if key else []
+    for path in (p for pattern in patterns for p in paths.expand_glob(pattern)):
+        try:
+            data = read_jsonc(path.read_text(encoding="utf-8", errors="replace"))
+        except (ValueError, OSError):
+            continue
+        found, value = json_lookup(data, str(key))
+        parsed = versions.parse(str(value)) if found else None
+        if parsed:
+            return ".".join(map(str, parsed))
+    argv = spec.get("argv")
+    if not argv or not allow_commands or not shutil.which(argv[0]):
+        return None
+    try:
+        proc = subprocess.run(argv, capture_output=True, text=True, timeout=15, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    got = versions.parse(proc.stdout + proc.stderr) if proc.returncode == 0 else None
+    return ".".join(map(str, got)) if got else None
+
+
+def run_check(check: Check, allow_commands: bool = False) -> Finding | None:
     kind = check["type"]
     if kind == "env":
         return check_env(check)
@@ -236,7 +271,7 @@ def run_check(check: dict, allow_commands: bool = False) -> Finding | None:
     raise ValueError(f"unknown check type: {kind}")
 
 
-def run_checks(check: dict, allow_commands: bool = False) -> list[Finding]:
+def run_checks(check: Check, allow_commands: bool = False) -> list[Finding]:
     """Read every profile when requested; ordinary file lists retain precedence."""
     component = check.get("component", "telemetry")
     if check.get("profiles"):

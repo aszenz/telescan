@@ -35,5 +35,13 @@
       "STRIPE_CLI_TELEMETRY_OPTOUT": "1"
     }
   },
-  "docs": "https://docs.stripe.com/stripe-cli"
+  "docs": "https://docs.stripe.com/stripe-cli",
+  "verification": "confirmed",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://github.com/stripe/stripe-cli/wiki/telemetry"
+  ]
 }

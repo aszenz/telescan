@@ -8,7 +8,7 @@
     "macos",
     "windows"
   ],
-  "what": "Sends usage analytics to Kong.",
+  "what": "Sends usage analytics to Kong. The app also sends analytics for a logged-in account when \"Send usage statistics\" is off.",
   "default_state": "on",
   "detect": {
     "paths": [
@@ -18,24 +18,25 @@
   },
   "checks": [
     {
-      "type": "json",
-      "key": "enableAnalytics",
-      "files": [
-        "{config}/Insomnia/insomnia.Settings.json",
-        "{home}/Library/Application Support/Insomnia/insomnia.Settings.json"
-      ],
-      "disabled_when": [
-        "*falsy*"
-      ],
-      "enabled_when": [
-        "*truthy*"
-      ]
+      "type": "manual"
     }
   ],
   "disable": {
     "steps": [
-      "Preferences > General: clear \"Send usage statistics\" and \"Send error reports\"."
+      "Preferences > General: clear \"Send usage statistics\".",
+      "Log out of your Kong account: a logged-in account still sends analytics.",
+      "Inso CLI: set INSO_TELEMETRY_DISABLED=1."
     ]
   },
-  "docs": "https://docs.insomnia.rest/insomnia/application-data"
+  "docs": "https://docs.insomnia.rest/insomnia/application-data",
+  "verification": "qualified",
+  "verified_at": "2026-09-24",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://developer.konghq.com/insomnia/collected-data/",
+    "https://github.com/Kong/insomnia/blob/develop/packages/insomnia/src/main/analytics.ts",
+    "https://github.com/Kong/insomnia/blob/develop/packages/insomnia-data/src/models/settings.ts"
+  ]
 }

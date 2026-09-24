@@ -32,5 +32,13 @@
       "VAGRANT_CHECKPOINT_DISABLE": "1"
     }
   },
-  "docs": "https://developer.hashicorp.com/vagrant/docs/other/environmental-variables"
+  "docs": "https://developer.hashicorp.com/vagrant/docs/other/environmental-variables",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://developer.hashicorp.com/vagrant/docs/other/environmental-variables"
+  ]
 }

@@ -18,7 +18,16 @@
   },
   "checks": [
     {
-      "type": "manual"
+      "type": "env",
+      "var": "CHECKPOINT_DISABLE",
+      "versions": "<7",
+      "disabled_when": [
+        "1"
+      ]
+    },
+    {
+      "type": "manual",
+      "versions": ">=7"
     }
   ],
   "disable": {
@@ -30,5 +39,25 @@
       "prisma telemetry disable"
     ]
   },
-  "docs": "https://docs.prisma.io/docs/cli/telemetry.md"
+  "docs": "https://docs.prisma.io/docs/cli/telemetry.md",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "update-checks"
+  ],
+  "evidence": [
+    "https://www.prisma.io/docs/orm/v6/tools/prisma-cli",
+    "https://docs.prisma.io/docs/cli/telemetry.md"
+  ],
+  "version": {
+    "files": [
+      "node_modules/prisma/package.json"
+    ],
+    "key": "version",
+    "argv": [
+      "prisma",
+      "--version"
+    ]
+  }
 }

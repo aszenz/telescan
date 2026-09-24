@@ -43,5 +43,13 @@
       "netlify --telemetry-disable"
     ]
   },
-  "docs": "https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/"
+  "docs": "https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/"
+  ]
 }

@@ -41,5 +41,14 @@
       "Fleet wide: set DisableTelemetry to true in the policies.json enterprise policy."
     ]
   },
-  "docs": "https://support.mozilla.org/kb/telemetry-clientid"
+  "docs": "https://support.mozilla.org/kb/telemetry-clientid",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://firefox-admin-docs.mozilla.org/reference/policies/disabletelemetry/",
+    "https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/internals/preferences.html"
+  ]
 }

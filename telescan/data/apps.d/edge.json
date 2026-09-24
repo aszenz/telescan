@@ -28,5 +28,14 @@
       "On supported managed Windows and macOS installations, set the DiagnosticData policy to 0 and restart Edge."
     ]
   },
-  "docs": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies#diagnosticdata"
+  "docs": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies#diagnosticdata",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/metricsreportingenabled",
+    "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/diagnosticdata"
+  ]
 }

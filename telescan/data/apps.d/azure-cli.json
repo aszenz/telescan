@@ -56,5 +56,14 @@
       "AZURE_CORE_COLLECT_TELEMETRY": "0"
     }
   },
-  "docs": "https://learn.microsoft.com/cli/azure/azure-cli-configuration"
+  "docs": "https://learn.microsoft.com/cli/azure/azure-cli-configuration",
+  "verification": "confirmed",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://learn.microsoft.com/en-us/cli/azure/azure-cli-configuration"
+  ]
 }

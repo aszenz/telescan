@@ -40,5 +40,14 @@
       "npm_config_update_notifier": "false"
     }
   },
-  "docs": "https://docs.npmjs.com/cli/v10/using-npm/config#update-notifier"
+  "docs": "https://docs.npmjs.com/cli/v10/using-npm/config#update-notifier",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "update-checks"
+  ],
+  "evidence": [
+    "https://github.com/npm/cli/blob/latest/lib/cli/update-notifier.js",
+    "https://docs.npmjs.com/cli/using-npm/config"
+  ]
 }

@@ -39,5 +39,13 @@
       "Set \"usage\": false in the Firebase configstore file."
     ]
   },
-  "docs": "https://firebase.google.com/support/privacy"
+  "docs": "https://firebase.google.com/support/privacy",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://github.com/firebase/firebase-tools/blob/master/src/track.ts"
+  ]
 }

@@ -59,5 +59,13 @@
       "TURBO_TELEMETRY_DISABLED": "1"
     }
   },
-  "docs": "https://turborepo.com/docs/telemetry"
+  "docs": "https://turborepo.com/docs/telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://github.com/vercel/turborepo/blob/main/crates/turborepo-telemetry/src/config.rs"
+  ]
 }

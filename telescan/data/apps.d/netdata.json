@@ -44,5 +44,14 @@
       "DISABLE_TELEMETRY": "1"
     }
   },
-  "docs": "https://learn.netdata.cloud/docs/netdata-agent/configuration/anonymous-telemetry-events"
+  "docs": "https://learn.netdata.cloud/docs/netdata-agent/configuration/anonymous-telemetry-events",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://learn.netdata.cloud/docs/netdata-agent/anonymous-telemetry-events",
+    "https://learn.netdata.cloud/docs/installation/docker"
+  ]
 }

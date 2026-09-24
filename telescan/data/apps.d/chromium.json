@@ -37,5 +37,15 @@
       "Settings > Privacy and security: turn off usage statistics and crash reports."
     ]
   },
-  "docs": "https://www.chromium.org/developers/"
+  "docs": "https://www.chromium.org/developers/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://github.com/chromium/chromium/blob/main/components/metrics/metrics_pref_names.h",
+    "https://chromeenterprise.google/policies/metrics-reporting-enabled/"
+  ]
 }

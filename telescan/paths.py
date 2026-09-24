@@ -73,7 +73,7 @@ def expand(path: str) -> str:
     """Replace placeholders and environment variables in `path`."""
     out = path
     for key, value in placeholders().items():
-        out = out.replace("{%s}" % key, value)
+        out = out.replace(f"{{{key}}}", value)
     out = os.path.expandvars(out)
     return os.path.expanduser(out)
 

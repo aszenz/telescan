@@ -57,5 +57,14 @@
       "Start the editor with --disable-telemetry for a single run."
     ]
   },
-  "docs": "https://code.visualstudio.com/docs/configure/telemetry"
+  "docs": "https://code.visualstudio.com/docs/configure/telemetry",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://code.visualstudio.com/docs/configure/telemetry"
+  ]
 }

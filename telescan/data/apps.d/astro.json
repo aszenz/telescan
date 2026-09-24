@@ -57,5 +57,16 @@
       "ASTRO_TELEMETRY_DISABLED": "1"
     }
   },
-  "docs": "https://astro.build/telemetry/"
+  "docs": "https://astro.build/telemetry/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://astro.build/telemetry/",
+    "https://github.com/withastro/astro/blob/main/packages/telemetry/src/index.ts",
+    "https://github.com/withastro/astro/blob/main/packages/telemetry/src/config-keys.ts",
+    "https://github.com/withastro/astro/blob/main/packages/telemetry/src/config.ts"
+  ]
 }

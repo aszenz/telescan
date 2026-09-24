@@ -8,18 +8,19 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from typing import Any
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from telescan import checks, paths, report  # noqa: E402
-from telescan import schema as app_schema  # noqa: E402
-from telescan.catalog import DATA_DIR, App, Catalog  # noqa: E402
-from telescan.cli import main  # noqa: E402
-from telescan.scanner import MANUAL, NOT_INSTALLED, scan_app  # noqa: E402
+from telescan import checks, paths, report
+from telescan import schema as app_schema
+from telescan.catalog import DATA_DIR, App, Catalog
+from telescan.cli import main
+from telescan.scanner import MANUAL, NOT_INSTALLED, scan_app
 
 
-def valid_entry(**overrides) -> dict:
+def valid_entry(**overrides: Any) -> dict[str, Any]:
     entry = {
         "id": "dup",
         "name": "Dup",
@@ -30,9 +31,27 @@ def valid_entry(**overrides) -> dict:
         "checks": [{"type": "env", "var": "DUP_TELEMETRY", "disabled_when": ["1"]}],
         "disable": {"steps": ["Set DUP_TELEMETRY=1."]},
         "docs": "https://example.com/telemetry",
+        "verification": "confirmed",
+        "verified_at": "2026-09-08",
+        "scope": ["usage-analytics"],
+        "evidence": ["https://example.com/telemetry"],
     }
     entry.update(overrides)
     return entry
+
+
+def found(check: dict[str, Any], allow_commands: bool = False) -> checks.Finding:
+    """Run a check that must find something."""
+    finding = checks.run_check(check, allow_commands)
+    assert finding is not None, f"no finding for {check}"
+    return finding
+
+
+def entry(catalog: Catalog, app_id: str) -> App:
+    """Return a catalog entry that must exist."""
+    app = catalog.get(app_id)
+    assert app is not None, f"no catalog entry {app_id}"
+    return app
 
 
 def write_entries(entries: list[dict]) -> Path:
@@ -123,19 +142,29 @@ class TestJsonc(unittest.TestCase):
 
 class TestChecks(TempHome):
     def test_env_check(self) -> None:
-        check = {"type": "env", "var": "TELESCAN_TEST", "disabled_when": ["*truthy*"], "enabled_when": ["*falsy*"]}
+        check = {
+            "type": "env",
+            "var": "TELESCAN_TEST",
+            "disabled_when": ["*truthy*"],
+            "enabled_when": ["*falsy*"],
+        }
         with mock.patch.dict(os.environ, {"TELESCAN_TEST": "1"}, clear=False):
-            self.assertEqual(checks.run_check(check).state, checks.DISABLED)
+            self.assertEqual(found(check).state, checks.DISABLED)
         with mock.patch.dict(os.environ, {"TELESCAN_TEST": "0"}, clear=False):
-            self.assertEqual(checks.run_check(check).state, checks.ENABLED)
+            self.assertEqual(found(check).state, checks.ENABLED)
         with mock.patch.dict(os.environ, {}, clear=True):
             self.assertIsNone(checks.run_check(check))
 
     def test_json_check(self) -> None:
         path = self.write("settings.json", '{"telemetry.telemetryLevel": "off"}')
-        check = {"type": "json", "key": "telemetry.telemetryLevel", "files": [str(path)],
-                 "disabled_when": ["off"], "enabled_when": ["all", "error"]}
-        self.assertEqual(checks.run_check(check).state, checks.DISABLED)
+        check = {
+            "type": "json",
+            "key": "telemetry.telemetryLevel",
+            "files": [str(path)],
+            "disabled_when": ["off"],
+            "enabled_when": ["all", "error"],
+        }
+        self.assertEqual(found(check).state, checks.DISABLED)
 
     def test_json_check_missing_key_is_none(self) -> None:
         path = self.write("settings.json", '{"unrelated": 1}')
@@ -144,25 +173,39 @@ class TestChecks(TempHome):
 
     def test_ini_check(self) -> None:
         path = self.write("config", "[core]\ndisable_usage_reporting = True\n")
-        check = {"type": "ini", "section": "core", "key": "disable_usage_reporting", "files": [str(path)],
-                 "disabled_when": ["*truthy*"], "enabled_when": ["*falsy*"]}
-        self.assertEqual(checks.run_check(check).state, checks.DISABLED)
+        check = {
+            "type": "ini",
+            "section": "core",
+            "key": "disable_usage_reporting",
+            "files": [str(path)],
+            "disabled_when": ["*truthy*"],
+            "enabled_when": ["*falsy*"],
+        }
+        self.assertEqual(found(check).state, checks.DISABLED)
 
     def test_regex_check(self) -> None:
         path = self.write("prefs.js", 'user_pref("datareporting.healthreport.uploadEnabled", false);\n')
-        check = {"type": "regex", "files": [str(path)],
-                 "disabled_pattern": r'uploadEnabled",\s*false', "enabled_pattern": r'uploadEnabled",\s*true'}
-        self.assertEqual(checks.run_check(check).state, checks.DISABLED)
+        check = {
+            "type": "regex",
+            "files": [str(path)],
+            "disabled_pattern": r'uploadEnabled",\s*false',
+            "enabled_pattern": r'uploadEnabled",\s*true',
+        }
+        self.assertEqual(found(check).state, checks.DISABLED)
 
     def test_file_check(self) -> None:
         path = self.write(".opt-out", "")
         check = {"type": "file", "files": [str(path)], "present": checks.DISABLED}
-        self.assertEqual(checks.run_check(check).state, checks.DISABLED)
+        self.assertEqual(found(check).state, checks.DISABLED)
 
     def test_command_check_needs_opt_in(self) -> None:
-        check = {"type": "command", "argv": ["echo", "analytics are disabled"], "disabled_pattern": "disabled"}
+        check = {
+            "type": "command",
+            "argv": ["echo", "analytics are disabled"],
+            "disabled_pattern": "disabled",
+        }
         self.assertIsNone(checks.run_check(check, allow_commands=False))
-        finding = checks.run_check(check, allow_commands=True)
+        finding = found(check, allow_commands=True)
         self.assertEqual(finding.state, checks.DISABLED)
 
     def test_unknown_check_type(self) -> None:
@@ -171,8 +214,14 @@ class TestChecks(TempHome):
 
 
 class TestScanner(TempHome):
-    def _app(self, **kwargs) -> App:
-        base = dict(id="x", name="X", category="test", platforms=["linux"], what="test app")
+    def _app(self, **kwargs: Any) -> App:
+        base: dict[str, Any] = {
+            "id": "x",
+            "name": "X",
+            "category": "test",
+            "platforms": ["linux"],
+            "what": "test app",
+        }
         base.update(kwargs)
         return App(**base)
 
@@ -182,27 +231,37 @@ class TestScanner(TempHome):
 
     def test_default_state_applies_when_nothing_is_found(self) -> None:
         marker = self.write("marker", "")
-        app = self._app(detect={"paths": [str(marker)]}, default_state="on",
-                        checks=[{"type": "env", "var": "TELESCAN_ABSENT", "disabled_when": ["1"]}])
+        app = self._app(
+            detect={"paths": [str(marker)]},
+            default_state="on",
+            checks=[{"type": "env", "var": "TELESCAN_ABSENT", "disabled_when": ["1"]}],
+        )
         with mock.patch.dict(os.environ, {}, clear=True):
             result = scan_app(app)
         self.assertEqual(result.status, checks.ENABLED)
         self.assertTrue(result.needs_action)
 
-    def test_opt_out_beats_enabled_finding(self) -> None:
+    def test_conflicting_settings_are_unknown(self) -> None:
         marker = self.write("marker", "")
         config = self.write("config.json", '{"telemetry": true}')
         app = self._app(
             detect={"paths": [str(marker)]},
             default_state="on",
             checks=[
-                {"type": "json", "key": "telemetry", "files": [str(config)],
-                 "disabled_when": ["*falsy*"], "enabled_when": ["*truthy*"]},
+                {
+                    "type": "json",
+                    "key": "telemetry",
+                    "files": [str(config)],
+                    "disabled_when": ["*falsy*"],
+                    "enabled_when": ["*truthy*"],
+                },
                 {"type": "env", "var": "TELESCAN_OPTOUT", "disabled_when": ["1"]},
             ],
         )
         with mock.patch.dict(os.environ, {"TELESCAN_OPTOUT": "1"}, clear=True):
-            self.assertEqual(scan_app(app).status, checks.DISABLED)
+            result = scan_app(app)
+        self.assertEqual(result.status, checks.UNKNOWN)
+        self.assertIn("conflicting settings", result.reason)
 
     def test_manual_only(self) -> None:
         marker = self.write("marker", "")
@@ -224,8 +283,9 @@ class TestCatalog(unittest.TestCase):
                 self.assertTrue(app.platforms)
                 self.assertTrue(app.steps, "missing opt-out steps")
                 self.assertTrue(app.docs.startswith("https://"))
-                self.assertTrue(app.detect.get("which") or app.detect.get("paths"),
-                                "no way to detect the app")
+                self.assertTrue(
+                    app.detect.get("which") or app.detect.get("paths"), "no way to detect the app"
+                )
 
     def test_one_file_per_app(self) -> None:
         files = sorted(path.stem for path in DATA_DIR.glob("*.json"))

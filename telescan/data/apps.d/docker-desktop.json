@@ -40,5 +40,14 @@
       "Fleet wide: set analyticsEnabled to false in the settings JSON, or use the admin settings file."
     ]
   },
-  "docs": "https://docs.docker.com/desktop/settings-and-maintenance/settings/"
+  "docs": "https://docs.docker.com/desktop/settings-and-maintenance/settings/",
+  "verification": "qualified",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics"
+  ],
+  "evidence": [
+    "https://docs.docker.com/desktop/settings-and-maintenance/settings/",
+    "https://docs.docker.com/enterprise/security/hardened-desktop/settings-management/settings-reference/"
+  ]
 }

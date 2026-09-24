@@ -37,5 +37,14 @@
       "SAM_CLI_TELEMETRY": "0"
     }
   },
-  "docs": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-telemetry.html"
+  "docs": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-telemetry.html",
+  "verification": "confirmed",
+  "verified_at": "2026-09-08",
+  "scope": [
+    "usage-analytics",
+    "crash-reporting"
+  ],
+  "evidence": [
+    "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-telemetry.html"
+  ]
 }
