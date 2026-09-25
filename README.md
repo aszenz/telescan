@@ -2,6 +2,9 @@
 
 ![logo](./docs/assets/telescan-logo-readme.png)
 
+A lot of tools devs use silently track usage this is called telemetry, 
+telemetry is opt in but can often be disabled in settings or via env var. 
+
 telescan reads the config files and environment variables of the developer
 and desktop apps on your machine, reports which ones still send telemetry, and
 shows how to turn each one off.
