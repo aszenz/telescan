@@ -16,3 +16,5 @@ All notable changes are recorded here. The format follows
 - `telescan scan <app>` shows the sources and how to turn each app off;
   `-v` does this for every app. `list`, `show`, `categories` and `--fix`
   are removed.
+- The output groups apps by telemetry state ("Telemetry on", "Telemetry off",
+  ...) and starts with a count for each group.

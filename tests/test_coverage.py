@@ -244,7 +244,7 @@ class TestCoverage(TempHome):
         for fmt in ("table", "json", "markdown"):
             with self.subTest(format=fmt), mock.patch("sys.stdout", new_callable=io.StringIO) as output:
                 self.assertEqual(main(["scan", "claude-code", "--format", fmt, "--no-color"]), 1)
-                self.assertIn("partial", output.getvalue().lower())
+                self.assertIn("partial" if fmt == "json" else "partly off", output.getvalue().lower())
                 if fmt == "json":
                     data = json.loads(output.getvalue())
                     self.assertEqual(data["summary"]["partial"], 1)

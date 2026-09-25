@@ -9,15 +9,33 @@ from typing import TextIO
 
 from .catalog import App
 from .checks import DISABLED, ENABLED, UNKNOWN
-from .scanner import MANUAL, NOT_INSTALLED, PARTIAL, Result, summarize
+from .scanner import MANUAL, NOT_INSTALLED, PARTIAL, STATUS_ORDER, Result, summarize
 
+# Every label names the telemetry, so "on" cannot be read as "protection on".
 LABELS = {
-    PARTIAL: "PARTIAL",
-    ENABLED: "ON",
-    DISABLED: "OFF",
-    UNKNOWN: "UNKNOWN",
-    MANUAL: "MANUAL",
-    NOT_INSTALLED: "ABSENT",
+    ENABLED: "Telemetry on",
+    PARTIAL: "Telemetry partly off",
+    UNKNOWN: "Cannot tell",
+    MANUAL: "Check by hand",
+    DISABLED: "Telemetry off",
+    NOT_INSTALLED: "Not installed",
+}
+# What each group means, printed under its heading.
+MEANINGS = {
+    ENABLED: "these apps send telemetry",
+    PARTIAL: "some telemetry is off, some is still on",
+    UNKNOWN: "a setting is unreadable, conflicts, or is missing",
+    MANUAL: "there is no local setting to read",
+    DISABLED: "telemetry is turned off",
+    NOT_INSTALLED: "",
+}
+# How to name a component state in a detail line.
+STATE_WORDS = {
+    ENABLED: "on",
+    PARTIAL: "partly off",
+    UNKNOWN: "cannot tell",
+    MANUAL: "check by hand",
+    DISABLED: "off",
 }
 
 COLORS = {
@@ -45,8 +63,8 @@ class Painter:
     def __init__(self, enabled: bool) -> None:
         self.enabled = enabled
 
-    def status(self, status: str) -> str:
-        text = LABELS[status]
+    def status(self, status: str, text: str = "") -> str:
+        text = text or LABELS[status]
         return f"{COLORS[status]}{text}{RESET}" if self.enabled else text
 
     def bold(self, text: str) -> str:
@@ -73,31 +91,50 @@ def _pad(text: str, width: int) -> str:
     return text + " " * max(0, width - _plain_width(text))
 
 
+def detail(result: Result) -> str:
+    """One short line: which parts are on and off, or why."""
+    if result.status == MANUAL:
+        return ""
+    if len(result.components) < 2:
+        return result.reason
+    if all(c.status == result.status for c in result.components):
+        # The heading already gives the state; name the parts only.
+        return ", ".join(dict.fromkeys(c.name for c in result.components))
+    parts: dict[str, list[str]] = {}
+    for component in result.components:
+        parts.setdefault(component.status, [])
+        if component.name not in parts[component.status]:
+            parts[component.status].append(component.name)
+    return "; ".join(
+        f"{STATE_WORDS[state]}: {', '.join(parts[state])}" for state in STATUS_ORDER if state in parts
+    )
+
+
 def render_table(results: list[Result], painter: Painter, verbose: bool = False) -> str:
     if not results:
-        return "No application from the catalog was found on this machine.\n"
-
-    rows = [
-        (painter.status(r.status), r.app.name, f"{r.app.category} · {r.app.verification}", r.reason)
-        for r in results
-    ]
-    status_w = max(_plain_width(r[0]) for r in rows)
-    name_w = min(38, max(len(r[1]) for r in rows))
-
+        return "No app from the catalog was found on this machine.\n"
     lines = []
-    for (status, name, category, reason), result in zip(rows, results):
-        line = f"{_pad(status, status_w)}  {_pad(name, name_w)}  {painter.dim(category)}"
-        if reason:
-            line += f"\n{' ' * (status_w + 2)}{painter.dim(reason)}"
-        lines.append(line)
-        if verbose:
-            lines.append(f"{' ' * (status_w + 2)}{painter.dim('· ' + provenance(result.app))}")
-            # One setting can serve several components; show it once.
-            for source, evidence in dict.fromkeys((f.source, f.evidence) for f in result.findings):
-                lines.append(f"{' ' * (status_w + 2)}{painter.dim('· ' + source + ': ' + evidence)}")
-            for url in result.app.evidence:
-                lines.append(f"{' ' * (status_w + 2)}{painter.dim('· evidence: ' + url)}")
-    return "\n".join(lines) + "\n"
+    for status in STATUS_ORDER:
+        group = [r for r in results if r.status == status]
+        if not group:
+            continue
+        heading = painter.status(status, f"{LABELS[status]} ({len(group)})")
+        meaning = MEANINGS[status]
+        lines.append(painter.bold(heading) + (painter.dim(f"  {meaning}") if meaning else ""))
+        id_w = max(len(r.app.id) for r in group)
+        for result in group:
+            text = f"  {result.app.id.ljust(id_w)}  {result.app.name}"
+            if result.installed and detail(result):
+                text += f"\n  {' ' * id_w}  {painter.dim(detail(result))}"
+            lines.append(text)
+            if verbose:
+                pad = " " * (id_w + 4)
+                lines.append(f"{pad}{painter.dim('· ' + provenance(result.app))}")
+                # One setting can serve several components; show it once.
+                for source, evidence in dict.fromkeys((f.source, f.evidence) for f in result.findings):
+                    lines.append(f"{pad}{painter.dim('· ' + source + ': ' + evidence)}")
+        lines.append("")
+    return "\n".join(lines)
 
 
 def provenance(app: App) -> str:
@@ -110,18 +147,16 @@ def provenance(app: App) -> str:
 
 def render_summary(results: list[Result], painter: Painter) -> str:
     counts = summarize(results)
-    parts = [
-        f"{counts[ENABLED]} on",
-        f"{counts[DISABLED]} off",
-        f"{counts[PARTIAL]} partial",
-        f"{counts[UNKNOWN]} unknown",
-        f"{counts[MANUAL]} manual",
-    ]
-    if counts[NOT_INSTALLED]:
-        parts.append(f"{counts[NOT_INSTALLED]} absent")
-    noun = "app" if counts["total"] == 1 else "apps"
-    head = painter.bold(f"{counts['total']} {noun} scanned: ")
-    return head + ", ".join(parts) + "\n"
+    found = counts["total"] - counts[NOT_INSTALLED]
+    noun = "app" if found == 1 else "apps"
+    if not found:
+        return painter.bold("None of these apps is installed on this machine.") + "\n"
+    lines = [painter.bold(f"telescan checked {found} {noun} on this machine.")]
+    width = len(str(max(counts[s] for s in STATUS_ORDER)))
+    for status in STATUS_ORDER:
+        if counts[status] and status != NOT_INSTALLED:
+            lines.append(f"  {str(counts[status]).rjust(width)}  {painter.status(status)}")
+    return "\n".join(lines) + "\n"
 
 
 def render_fixes(results: list[Result], painter: Painter, include_absent: bool = False) -> str:
@@ -131,8 +166,7 @@ def render_fixes(results: list[Result], painter: Painter, include_absent: bool =
     lines = [painter.bold("How to turn the telemetry off:"), ""]
     for result in todo:
         app = result.app
-        name = app.name if f"({app.id})" in app.name else f"{app.name}  ({app.id})"
-        lines.append(f"{painter.status(result.status)} {painter.bold(name)}")
+        lines.append(f"{painter.bold(app.name)}  {painter.status(result.status)}")
         lines.append(f"    {app.what}")
         for step in app.steps:
             lines.append(f"    - {step}")
@@ -141,6 +175,9 @@ def render_fixes(results: list[Result], painter: Painter, include_absent: bool =
             lines.append(f"    - export {pairs}")
         if app.docs:
             lines.append(f"    {painter.dim(app.docs)}")
+        for url in app.evidence:
+            if url != app.docs:
+                lines.append(f"    {painter.dim('evidence: ' + url)}")
         lines.append("")
     return "\n".join(lines)
 
@@ -223,14 +260,13 @@ def render_markdown(results: list[Result]) -> str:
     lines = [
         "# Telemetry report",
         "",
-        f"{counts['total']} applications scanned: {counts[ENABLED]} on, {counts[DISABLED]} off, "
-        f"{counts[PARTIAL]} partial, {counts[UNKNOWN]} unknown, {counts[MANUAL]} manual.",
+        ", ".join(f"{LABELS[s]}: {counts[s]}" for s in STATUS_ORDER if counts[s]) + ".",
         "",
         "| Status | Application | Category | Verification | Scope | Detail | Docs |",
         "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for r in results:
-        reason = r.reason.replace("|", "\\|")
+        reason = (detail(r) or r.reason).replace("|", "\\|")
         docs = f"[docs]({r.app.docs})" if r.app.docs else ""
         verification = f"{r.app.verification} ({r.app.verified_at})"
         scope = ", ".join(r.app.scope)

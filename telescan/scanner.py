@@ -145,12 +145,12 @@ def _resolve(findings: list[checks.Finding], default: str, manual: bool) -> tupl
     if findings:
         return findings[0].state, findings[0].evidence
     if manual:
-        return MANUAL, "no local switch to read; check by hand"
+        return MANUAL, "no local setting to read"
     if default == "on":
-        return checks.ENABLED, "no opt-out found; assumed on from catalog default"
+        return checks.ENABLED, "on by default, and no opt-out is set"
     if default == "off":
-        return checks.DISABLED, "assumed off from catalog default"
-    return checks.UNKNOWN, "no setting found"
+        return checks.DISABLED, "off by default"
+    return checks.UNKNOWN, "no setting found, and the default is not known"
 
 
 def scan(

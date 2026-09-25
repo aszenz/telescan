@@ -386,7 +386,7 @@ class TestCli(unittest.TestCase):
     def test_named_app_shows_how_to_turn_it_off(self) -> None:
         _, out = self.run_cli(["scan", "homebrew", "--no-color", "--fail-on", "never"])
         self.assertIn("HOMEBREW_NO_ANALYTICS", out)
-        self.assertIn("evidence:", out)
+        self.assertIn("https://docs.brew.sh/Analytics", out)
 
     def test_fail_on_never_exits_zero(self) -> None:
         code, _ = self.run_cli(["--fail-on", "never"])
@@ -414,11 +414,11 @@ class TestCli(unittest.TestCase):
 class TestReport(unittest.TestCase):
     def test_no_color_painter(self) -> None:
         painter = report.Painter(False)
-        self.assertEqual(painter.status(checks.ENABLED), "ON")
+        self.assertEqual(painter.status(checks.ENABLED), "Telemetry on")
 
     def test_color_painter(self) -> None:
         painter = report.Painter(True)
-        self.assertIn("ON", painter.status(checks.ENABLED))
+        self.assertIn("Telemetry on", painter.status(checks.ENABLED))
         self.assertIn("\033", painter.status(checks.ENABLED))
 
 

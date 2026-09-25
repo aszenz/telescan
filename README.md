@@ -27,8 +27,13 @@ telescan scan vscode npm  # scan some apps, and show how to turn each one off
 telescan scan -v          # show sources and how to turn off every hit
 ```
 
-Each app gets a status: `ON`, `OFF`, `PARTIAL`, `UNKNOWN` or `MANUAL`.
-`MANUAL` means there is no local setting to read, so check it by hand.
+telescan puts each app in one group:
+
+- **Telemetry on**: the app sends telemetry.
+- **Telemetry partly off**: some telemetry is off, some is still on.
+- **Telemetry off**: all the telemetry that telescan knows is off.
+- **Cannot tell**: a setting is unreadable, conflicts, or is missing.
+- **Check by hand**: the app has no local setting to read.
 
 ## Features
 

@@ -133,14 +133,13 @@ def cmd_scan(args: argparse.Namespace, catalog: Catalog) -> int:
     elif args.format == "markdown":
         report.write(report.render_markdown(results))
     else:
-        report.write(report.render_table(results, painter, verbose=verbose))
-        report.write("\n" + report.render_summary(results, painter))
+        # The summary comes first, so that it does not scroll away.
+        report.write(report.render_summary(results, painter))
+        if not verbose and any(r.needs_action for r in results):
+            report.write(painter.dim("To turn it off: telescan scan <app>, or telescan scan -v for all.\n"))
+        report.write("\n" + report.render_table(results, painter, verbose=verbose))
         if verbose:
             report.write("\n" + report.render_fixes(results, painter, include_absent=bool(ids)))
-        elif any(r.needs_action for r in results):
-            report.write(
-                painter.dim("Run 'telescan scan <app>' or 'telescan scan -v' to see how to turn these off.\n")
-            )
 
     if args.export_env:
         report.write("\n" + report.render_shell_profile(results))
